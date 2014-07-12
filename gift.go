@@ -31,7 +31,7 @@ import (
 type Filter interface {
 	// Draw applies the filter to the src image and outputs the result to the dst image.
 	Draw(dst draw.Image, src image.Image, options *Options)
-	// Bounds calculates the appropriate bounds of an image after the filter.
+	// Bounds calculates the appropriate bounds of an image after applying the filter.
 	Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle)
 }
 
