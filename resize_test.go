@@ -58,9 +58,9 @@ func TestResize(t *testing.T) {
 		2, 4,
 		7, 0,
 	}
-	g := New(Resize(2, 2, NearestNeighborResampling))
-	img1 = image.NewGray(g.Bounds(img0.Bounds()))
-	g.Draw(img1, img0)
+	f := Resize(2, 2, NearestNeighborResampling)
+	img1 = image.NewGray(f.Bounds(img0.Bounds()))
+	f.Draw(img1, img0, nil)
 	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
 	}
@@ -78,9 +78,9 @@ func TestResize(t *testing.T) {
 	img1_exp.Pix = []uint8{
 		3, 5,
 	}
-	g = New(Resize(2, 1, BoxResampling))
-	img1 = image.NewGray(g.Bounds(img0.Bounds()))
-	g.Draw(img1, img0)
+	f = Resize(2, 1, BoxResampling)
+	img1 = image.NewGray(f.Bounds(img0.Bounds()))
+	f.Draw(img1, img0, nil)
 	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
 	}
@@ -90,9 +90,9 @@ func TestResize(t *testing.T) {
 
 	// Empty image should remain empty and not panic
 	img0 = &image.Gray{}
-	g = New(Resize(100, 100, BoxResampling))
-	img1 = image.NewGray(g.Bounds(img0.Bounds()))
-	g.Draw(img1, img0)
+	f = Resize(100, 100, BoxResampling)
+	img1 = image.NewGray(f.Bounds(img0.Bounds()))
+	f.Draw(img1, img0, nil)
 	if img1.Bounds().Dx() != 0 || img1.Bounds().Dy() != 0 {
 		t.Errorf("empty image resized is not empty: %dx%d", img1.Bounds().Dx(), img1.Bounds().Dy())
 	}
@@ -108,12 +108,11 @@ func TestResize(t *testing.T) {
 	if sinc(0) != 1 {
 		t.Errorf("sinc(0) != 1")
 	}
-	if bcspline(2.0, 0.0, 0.5) != 0 {
+	if bcspline(-2.0, 0.0, 0.5) != 0 {
 		t.Errorf("bcspline(2.0, ...) != 0")
 	}
 
 	if (resamplingStruct{name: "test"}).String() != "test" {
 		t.Error("resamplingStruct String() fail")
 	}
-
 }

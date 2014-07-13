@@ -96,6 +96,27 @@ func TestConvolution(t *testing.T) {
 			},
 		},
 		{
+			"convolution (3x3, true, true, true, 0)",
+			[]float32{
+				0, 0, 0,
+				-0.5, 0, 0.5,
+				0, 0, 0,
+			},
+			true, true, true, 0,
+			image.Rect(-1, -1, 2, 2),
+			image.Rect(0, 0, 3, 3),
+			[]uint8{
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x40, 0x60, 0x80,
+				0x80, 0x60, 0x40, 0x20, 0x00, 0x00, 0x00, 0x00, 0x20, 0x40, 0x60, 0x80,
+				0x80, 0x60, 0x40, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			},
+			[]uint8{
+				0x00, 0x00, 0x00, 0x00, 0x20, 0x40, 0x60, 0x80, 0x20, 0x40, 0x60, 0x80,
+				0x80, 0x60, 0x40, 0x20, 0x60, 0x20, 0x20, 0x60, 0x20, 0x40, 0x60, 0x80,
+				0x80, 0x60, 0x40, 0x20, 0x80, 0x60, 0x40, 0x20, 0x00, 0x00, 0x00, 0x00,
+			},
+		},
+		{
 			"convolution (3x3, false, true, false, 3 / 255.0)",
 			[]float32{
 				0, 0, 1,
@@ -193,6 +214,16 @@ func TestConvolution(t *testing.T) {
 			t.Errorf("unexpected kernel size: %d %d", d.klen, sz)
 		}
 	}
+
+	// check no panics
+	Convolution([]float32{}, true, true, true, 1).Draw(image.NewGray(image.Rect(0, 0, 0, 0)), image.NewGray(image.Rect(0, 0, 0, 0)), nil)
+	convolve1dh(image.NewGray(image.Rect(0, 0, 1, 1)), image.NewGray(image.Rect(0, 0, 1, 1)), []float32{}, nil)
+	convolve1dv(image.NewGray(image.Rect(0, 0, 1, 1)), image.NewGray(image.Rect(0, 0, 1, 1)), []float32{}, nil)
+	convolve1dh(image.NewGray(image.Rect(0, 0, 0, 0)), image.NewGray(image.Rect(0, 0, 0, 0)), []float32{}, nil)
+	convolve1dv(image.NewGray(image.Rect(0, 0, 0, 0)), image.NewGray(image.Rect(0, 0, 0, 0)), []float32{}, nil)
+	convolveLine(&[]pixel{}, []pixel{}, []uweight{})
+	prepareConvolutionWeights1d([]float32{0, 0})
+	prepareConvolutionWeights1d([]float32{})
 }
 
 func TestGaussianBlur(t *testing.T) {

@@ -93,29 +93,4 @@ func TestGIFT(t *testing.T) {
 	if dst.Pix[0] != 123 {
 		t.Error("unexpected dst pix")
 	}
-
-	tmp1 := createTempImage(image.Rect(-1, -2, 1, 2))
-	if !tmp1.Bounds().Eq(image.Rect(-1, -2, 1, 2)) {
-		t.Error("unexpected temp image bounds")
-	}
-	tmp2 := createTempImage(image.Rect(-3, -4, 3, 4))
-	if !tmp2.Bounds().Eq(image.Rect(-3, -4, 3, 4)) {
-		t.Error("unexpected temp image bounds")
-	}
-	copyimage(tmp1, tmp2, nil)
-}
-
-func checkBoundsAndPix(b1, b2 image.Rectangle, pix1, pix2 []uint8) bool {
-	if !b1.Eq(b2) {
-		return false
-	}
-	if len(pix1) != len(pix2) {
-		return false
-	}
-	for i := 0; i < len(pix1); i++ {
-		if pix1[i] != pix2[i] {
-			return false
-		}
-	}
-	return true
 }

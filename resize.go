@@ -159,32 +159,19 @@ func resizeVertical(dst draw.Image, src image.Image, h int, resampling Resamplin
 func resizeNearest(dst draw.Image, src image.Image, w, h int, options *Options) {
 	srcb := src.Bounds()
 	dstb := dst.Bounds()
+	dx := float64(srcb.Dx()) / float64(w)
+	dy := float64(srcb.Dy()) / float64(h)
 
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
-
-	dx := float64(srcb.Dx()) / float64(w)
-	dy := float64(srcb.Dy()) / float64(h)
 
 	parallelize(options.Parallelization, dstb.Min.Y, dstb.Min.Y+h, func(pmin, pmax int) {
 		for dsty := pmin; dsty < pmax; dsty++ {
 			for dstx := dstb.Min.X; dstx < dstb.Min.X+w; dstx++ {
 				fx := math.Floor((float64(dstx-dstb.Min.X) + 0.5) * dx)
 				fy := math.Floor((float64(dsty-dstb.Min.Y) + 0.5) * dy)
-
 				srcx := srcb.Min.X + int(fx)
-				if srcx > srcb.Max.X-1 {
-					srcx = srcb.Max.X - 1
-				} else if srcx < srcb.Min.X {
-					srcx = srcb.Min.X
-				}
 				srcy := srcb.Min.Y + int(fy)
-				if srcy > srcb.Max.Y-1 {
-					srcy = srcb.Max.Y - 1
-				} else if srcy < srcb.Min.Y {
-					srcy = srcb.Min.Y
-				}
-
 				px := pixGetter.getPixel(srcx, srcy)
 				pixSetter.setPixel(dstx, dsty, px)
 			}

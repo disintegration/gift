@@ -31,9 +31,9 @@ func TestRotate90(t *testing.T) {
 		1, 5,
 	}
 
-	g := New(Rotate90())
-	img1 := image.NewGray(g.Bounds(img0.Bounds()))
-	g.Draw(img1, img0)
+	f := Rotate90()
+	img1 := image.NewGray(f.Bounds(img0.Bounds()))
+	f.Draw(img1, img0, nil)
 
 	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
@@ -55,9 +55,9 @@ func TestRotate180(t *testing.T) {
 		4, 3, 2, 1,
 	}
 
-	g := New(Rotate180())
-	img1 := image.NewGray(g.Bounds(img0.Bounds()))
-	g.Draw(img1, img0)
+	f := Rotate180()
+	img1 := image.NewGray(f.Bounds(img0.Bounds()))
+	f.Draw(img1, img0, nil)
 
 	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
@@ -81,9 +81,9 @@ func TestRotate270(t *testing.T) {
 		8, 4,
 	}
 
-	g := New(Rotate270())
-	img1 := image.NewGray(g.Bounds(img0.Bounds()))
-	g.Draw(img1, img0)
+	f := Rotate270()
+	img1 := image.NewGray(f.Bounds(img0.Bounds()))
+	f.Draw(img1, img0, nil)
 
 	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
@@ -107,9 +107,9 @@ func TestTranspose(t *testing.T) {
 		4, 8,
 	}
 
-	g := New(Transpose())
-	img1 := image.NewGray(g.Bounds(img0.Bounds()))
-	g.Draw(img1, img0)
+	f := Transpose()
+	img1 := image.NewGray(f.Bounds(img0.Bounds()))
+	f.Draw(img1, img0, nil)
 
 	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
@@ -131,9 +131,9 @@ func TestFlipVertically(t *testing.T) {
 		1, 2, 3, 4,
 	}
 
-	g := New(FlipVertically())
-	img1 := image.NewGray(g.Bounds(img0.Bounds()))
-	g.Draw(img1, img0)
+	f := FlipVertically()
+	img1 := image.NewGray(f.Bounds(img0.Bounds()))
+	f.Draw(img1, img0, nil)
 
 	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
@@ -155,9 +155,9 @@ func TestFlipHorizontally(t *testing.T) {
 		8, 7, 6, 5,
 	}
 
-	g := New(FlipHorizontally())
-	img1 := image.NewGray(g.Bounds(img0.Bounds()))
-	g.Draw(img1, img0)
+	f := FlipHorizontally()
+	img1 := image.NewGray(f.Bounds(img0.Bounds()))
+	f.Draw(img1, img0, nil)
 
 	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())

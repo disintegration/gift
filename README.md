@@ -37,20 +37,24 @@ g.Draw(dst, src)
 
 + Transformations
 
+    - FlipHorizontally()
+    - FlipVertically()
     - Resize(width, height int, resampling Resampling)
     - Rotate180()
     - Rotate270()
     - Rotate90()
-    - FlipHorizontally()
-    - FlipVertically()
     - Transpose()
     
 + Effects & color modifications
 
-    - InvertColors()
     - AdjustGamma(gamma float32)
-    - GaussianBlur(sigma float32)
-    - UnsharpMask(sigma, amount, thresold float32)
-    - Convolution(kernel []float32, normalize, alpha, abs bool, delta float32)
     - ColorspaceLinearToSRGB()
     - ColorspaceSRGBToLinear()
+    - Convolution(kernel []float32, normalize, alpha, abs bool, delta float32)
+    - GaussianBlur(sigma float32)
+    - InvertColors()
+    - Maximum(ksize int, disk bool)
+    - Median(ksize int, disk bool)
+    - Minimum(ksize int, disk bool)
+    - UnsharpMask(sigma, amount, thresold float32)
+
