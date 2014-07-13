@@ -321,6 +321,11 @@ func (p *gausssianBlurFilter) Draw(dst draw.Image, src image.Image, options *Opt
 		options = &defaultOptions
 	}
 
+	srcb := src.Bounds()
+	if srcb.Dx() <= 0 || srcb.Dy() <= 0 {
+		return
+	}
+
 	if p.sigma <= 0 {
 		copyimage(dst, src, options)
 		return
@@ -345,7 +350,7 @@ func (p *gausssianBlurFilter) Draw(dst draw.Image, src image.Image, options *Opt
 		kernel[i] /= sum
 	}
 
-	tmp := createTempImage(src.Bounds())
+	tmp := createTempImage(srcb)
 	convolve1dh(tmp, src, kernel, options)
 	convolve1dv(dst, tmp, kernel, options)
 }
@@ -395,6 +400,10 @@ func (p *unsharpMaskFilter) Draw(dst draw.Image, src image.Image, options *Optio
 	srcb := src.Bounds()
 	dstb := dst.Bounds()
 
+	if srcb.Dx() <= 0 || srcb.Dy() <= 0 {
+		return
+	}
+
 	blurred := createTempImage(srcb)
 	blur := GaussianBlur(p.sigma)
 	blur.Draw(blurred, src, options)
@@ -439,5 +448,61 @@ func UnsharpMask(sigma, amount, thresold float32) Filter {
 		sigma:    sigma,
 		amount:   amount,
 		thresold: thresold,
+	}
+}
+
+type meanFilter struct {
+	ksize int
+	disk  bool
+}
+
+func (p *meanFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle) {
+	dstBounds = image.Rect(0, 0, srcBounds.Dx(), srcBounds.Dy())
+	return
+}
+
+func (p *meanFilter) Draw(dst draw.Image, src image.Image, options *Options) {
+	if options == nil {
+		options = &defaultOptions
+	}
+
+	srcb := src.Bounds()
+	if srcb.Dx() <= 0 || srcb.Dy() <= 0 {
+		return
+	}
+
+	ksize := p.ksize
+	if ksize%2 == 0 {
+		ksize -= 1
+	}
+
+	if ksize <= 1 {
+		copyimage(dst, src, options)
+		return
+	}
+
+	if p.disk {
+		diskKernel := genDisk(p.ksize)
+		f := Convolution(diskKernel, true, true, false, 0.0)
+		f.Draw(dst, src, options)
+	} else {
+		kernel := make([]float32, ksize)
+		for i, _ := range kernel {
+			kernel[i] = 1.0 / float32(ksize)
+		}
+		tmp := createTempImage(src.Bounds())
+		convolve1dh(tmp, src, kernel, options)
+		convolve1dv(dst, tmp, kernel, options)
+	}
+}
+
+// Mean creates a local mean image filter.
+// Takes an average across a neighborhood for each pixel.
+// The ksize parameter is the kernel size. It must be an odd positive integer (for example: 3, 5, 7).
+// If the disk parameter is true, a disk-shaped neighborhood will be used instead of a square neighborhood.
+func Mean(ksize int, disk bool) Filter {
+	return &meanFilter{
+		ksize: ksize,
+		disk:  disk,
 	}
 }

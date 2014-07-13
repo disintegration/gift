@@ -312,6 +312,9 @@ func TestGaussianBlur(t *testing.T) {
 			t.Errorf("test [%s] failed: %#v, %#v", d.desc, dst.Bounds(), dst.Pix)
 		}
 	}
+
+	// check no panics
+	GaussianBlur(0.5).Draw(image.NewGray(image.Rect(0, 0, 0, 0)), image.NewGray(image.Rect(0, 0, 0, 0)), nil)
 }
 
 func TestUnsharpMask(t *testing.T) {
@@ -400,4 +403,115 @@ func TestUnsharpMask(t *testing.T) {
 			t.Errorf("test [%s] failed: %#v, %#v", d.desc, dst.Bounds(), dst.Pix)
 		}
 	}
+
+	// check no panics
+	UnsharpMask(0.5, 1.0, 0.0).Draw(image.NewGray(image.Rect(0, 0, 0, 0)), image.NewGray(image.Rect(0, 0, 0, 0)), nil)
+}
+
+func TestMean(t *testing.T) {
+
+	testData := []struct {
+		desc           string
+		ksize          int
+		disk           bool
+		srcb, dstb     image.Rectangle
+		srcPix, dstPix []uint8
+	}{
+		{
+			"mean (0x0 false)",
+			0, false,
+			image.Rect(-1, -1, 4, 2),
+			image.Rect(0, 0, 5, 3),
+			[]uint8{
+				0x00, 0x40, 0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0, 0xB0, 0x60,
+				0x00, 0x80, 0x00, 0x80, 0x00,
+			},
+			[]uint8{
+				0x00, 0x40, 0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0, 0xB0, 0x60,
+				0x00, 0x80, 0x00, 0x80, 0x00,
+			},
+		},
+		{
+			"mean (1x1 false)",
+			1, false,
+			image.Rect(-1, -1, 4, 2),
+			image.Rect(0, 0, 5, 3),
+			[]uint8{
+				0x00, 0x40, 0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0, 0xB0, 0x60,
+				0x00, 0x80, 0x00, 0x80, 0x00,
+			},
+			[]uint8{
+				0x00, 0x40, 0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0, 0xB0, 0x60,
+				0x00, 0x80, 0x00, 0x80, 0x00,
+			},
+		},
+		{
+			"mean (2x2 true)",
+			2, true,
+			image.Rect(-1, -1, 4, 2),
+			image.Rect(0, 0, 5, 3),
+			[]uint8{
+				0x00, 0x40, 0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0, 0xB0, 0x60,
+				0x00, 0x80, 0x00, 0x80, 0x00,
+			},
+			[]uint8{
+				0x00, 0x40, 0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0, 0xB0, 0x60,
+				0x00, 0x80, 0x00, 0x80, 0x00,
+			},
+		},
+		{
+			"mean (3x3 false)",
+			3, false,
+			image.Rect(-1, -1, 4, 2),
+			image.Rect(0, 0, 5, 3),
+			[]uint8{
+				0x10, 0x40, 0x00, 0x40, 0x10,
+				0x20, 0x50, 0x00, 0x50, 0x20,
+				0x30, 0x60, 0x00, 0x60, 0x30,
+			},
+			[]uint8{
+				0x25, 0x1E, 0x2E, 0x1E, 0x25,
+				0x30, 0x25, 0x35, 0x25, 0x30,
+				0x3B, 0x2C, 0x3C, 0x2C, 0x3B,
+			},
+		},
+		{
+			"mean (3x3 true)",
+			3, true,
+			image.Rect(-1, -1, 4, 2),
+			image.Rect(0, 0, 5, 3),
+			[]uint8{
+				0x10, 0x40, 0x00, 0x40, 0x10,
+				0x20, 0x50, 0x00, 0x50, 0x20,
+				0x30, 0x60, 0x00, 0x60, 0x30,
+			},
+			[]uint8{
+				0x1D, 0x2D, 0x1A, 0x2D, 0x1D,
+				0x2A, 0x36, 0x20, 0x36, 0x2A,
+				0x36, 0x40, 0x26, 0x40, 0x36,
+			},
+		},
+	}
+
+	for _, d := range testData {
+		src := image.NewGray(d.srcb)
+		src.Pix = d.srcPix
+
+		f := Mean(d.ksize, d.disk)
+		dst := image.NewGray(f.Bounds(src.Bounds()))
+		f.Draw(dst, src, nil)
+
+		if !checkBoundsAndPix(dst.Bounds(), d.dstb, dst.Pix, d.dstPix) {
+			t.Errorf("test [%s] failed: %#v, %#v", d.desc, dst.Bounds(), dst.Pix)
+		}
+	}
+
+	// check no panics
+	Mean(5, false).Draw(image.NewGray(image.Rect(0, 0, 0, 0)), image.NewGray(image.Rect(0, 0, 0, 0)), nil)
 }
