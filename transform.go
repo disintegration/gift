@@ -11,9 +11,10 @@ const (
 	ttRotate90 transformType = iota
 	ttRotate180
 	ttRotate270
+	ttFlipHorizontal
+	ttFlipVertical
 	ttTranspose
-	ttFlipVertically
-	ttFlipHorizontally
+	ttTransverse
 )
 
 func transform(dst draw.Image, src image.Image, tt transformType, options *Options) {
@@ -37,15 +38,18 @@ func transform(dst draw.Image, src image.Image, tt transformType, options *Optio
 				case ttRotate270:
 					dstx = dstb.Min.X + srcb.Max.Y - srcy - 1
 					dsty = dstb.Min.Y + srcx - srcb.Min.X
+				case ttFlipHorizontal:
+					dstx = dstb.Min.X + srcb.Max.X - srcx - 1
+					dsty = dstb.Min.Y + srcy - srcb.Min.Y
+				case ttFlipVertical:
+					dstx = dstb.Min.X + srcx - srcb.Min.X
+					dsty = dstb.Min.Y + srcb.Max.Y - srcy - 1
 				case ttTranspose:
 					dstx = dstb.Min.X + srcy - srcb.Min.Y
 					dsty = dstb.Min.Y + srcx - srcb.Min.X
-				case ttFlipVertically:
-					dstx = dstb.Min.X + srcx - srcb.Min.X
-					dsty = dstb.Min.Y + srcb.Max.Y - srcy - 1
-				case ttFlipHorizontally:
-					dstx = dstb.Min.X + srcb.Max.X - srcx - 1
-					dsty = dstb.Min.Y + srcy - srcb.Min.Y
+				case ttTransverse:
+					dstx = dstb.Min.Y + srcb.Max.Y - srcy - 1
+					dsty = dstb.Min.X + srcb.Max.X - srcx - 1
 				}
 				pixSetter.setPixel(dstx, dsty, pixGetter.getPixel(srcx, srcy))
 			}
@@ -58,7 +62,7 @@ type transformFilter struct {
 }
 
 func (p *transformFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle) {
-	if p.tt == ttRotate90 || p.tt == ttRotate270 || p.tt == ttTranspose {
+	if p.tt == ttRotate90 || p.tt == ttRotate270 || p.tt == ttTranspose || p.tt == ttTransverse {
 		dstBounds = image.Rect(0, 0, srcBounds.Dy(), srcBounds.Dx())
 	} else {
 		dstBounds = image.Rect(0, 0, srcBounds.Dx(), srcBounds.Dy())
@@ -73,44 +77,51 @@ func (p *transformFilter) Draw(dst draw.Image, src image.Image, options *Options
 	transform(dst, src, p.tt, options)
 }
 
-// Rotate90 creates a filter that rotates an image by 90 degrees counter-clockwise.
+// Rotate90 creates a filter that rotates an image 90 degrees counter-clockwise.
 func Rotate90() Filter {
 	return &transformFilter{
 		tt: ttRotate90,
 	}
 }
 
-// Rotate180 creates a filter that rotates an image by 180 degrees counter-clockwise.
+// Rotate180 creates a filter that rotates an image 180 degrees counter-clockwise.
 func Rotate180() Filter {
 	return &transformFilter{
 		tt: ttRotate180,
 	}
 }
 
-// Rotate270 creates a filter that rotates an image by 270 degrees counter-clockwise.
+// Rotate270 creates a filter that rotates an image 270 degrees counter-clockwise.
 func Rotate270() Filter {
 	return &transformFilter{
 		tt: ttRotate270,
 	}
 }
 
-// Transpose creates a filter that transposes an image (reflects over the main diagonal).
+// FlipHorizontal creates a filter that flips an image horizontally.
+func FlipHorizontal() Filter {
+	return &transformFilter{
+		tt: ttFlipHorizontal,
+	}
+}
+
+// FlipVertical creates a filter that flips an image vertically.
+func FlipVertical() Filter {
+	return &transformFilter{
+		tt: ttFlipVertical,
+	}
+}
+
+// Transpose creates a filter that flips an image horizontally and rotates 90 degrees counter-clockwise.
 func Transpose() Filter {
 	return &transformFilter{
 		tt: ttTranspose,
 	}
 }
 
-// FlipVertically creates a filter that flips an image vertically.
-func FlipVertically() Filter {
+// Transverse creates a filter that flips an image vertically and rotates 90 degrees counter-clockwise.
+func Transverse() Filter {
 	return &transformFilter{
-		tt: ttFlipVertically,
-	}
-}
-
-// FlipHorizontally creates a filter that flips an image horizontally.
-func FlipHorizontally() Filter {
-	return &transformFilter{
-		tt: ttFlipHorizontally,
+		tt: ttTransverse,
 	}
 }

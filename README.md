@@ -37,13 +37,14 @@ g.Draw(dst, src)
 
 + Transformations
 
-    - FlipHorizontally()
-    - FlipVertically()
+    - FlipHorizontal()
+    - FlipVertical()
     - Resize(width, height int, resampling Resampling)
     - Rotate180()
     - Rotate270()
     - Rotate90()
     - Transpose()
+    - Transverse()
     
 + Effects & color modifications
 

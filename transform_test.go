@@ -93,6 +93,54 @@ func TestRotate270(t *testing.T) {
 	}
 }
 
+func TestFlipHorizontal(t *testing.T) {
+	img0 := image.NewGray(image.Rect(-1, -1, 3, 1))
+	img0.Pix = []uint8{
+		1, 2, 3, 4,
+		5, 6, 7, 8,
+	}
+	img1_exp := image.NewGray(image.Rect(0, 0, 4, 2))
+	img1_exp.Pix = []uint8{
+		4, 3, 2, 1,
+		8, 7, 6, 5,
+	}
+
+	f := FlipHorizontal()
+	img1 := image.NewGray(f.Bounds(img0.Bounds()))
+	f.Draw(img1, img0, nil)
+
+	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
+		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
+	}
+	if !comparePix(img1_exp.Pix, img1.Pix) {
+		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
+	}
+}
+
+func TestFlipVertical(t *testing.T) {
+	img0 := image.NewGray(image.Rect(-1, -1, 3, 1))
+	img0.Pix = []uint8{
+		1, 2, 3, 4,
+		5, 6, 7, 8,
+	}
+	img1_exp := image.NewGray(image.Rect(0, 0, 4, 2))
+	img1_exp.Pix = []uint8{
+		5, 6, 7, 8,
+		1, 2, 3, 4,
+	}
+
+	f := FlipVertical()
+	img1 := image.NewGray(f.Bounds(img0.Bounds()))
+	f.Draw(img1, img0, nil)
+
+	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
+		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
+	}
+	if !comparePix(img1_exp.Pix, img1.Pix) {
+		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
+	}
+}
+
 func TestTranspose(t *testing.T) {
 	img0 := image.NewGray(image.Rect(-1, -1, 3, 1))
 	img0.Pix = []uint8{
@@ -119,43 +167,21 @@ func TestTranspose(t *testing.T) {
 	}
 }
 
-func TestFlipVertically(t *testing.T) {
+func TestTransverse(t *testing.T) {
 	img0 := image.NewGray(image.Rect(-1, -1, 3, 1))
 	img0.Pix = []uint8{
 		1, 2, 3, 4,
 		5, 6, 7, 8,
 	}
-	img1_exp := image.NewGray(image.Rect(0, 0, 4, 2))
+	img1_exp := image.NewGray(image.Rect(0, 0, 2, 4))
 	img1_exp.Pix = []uint8{
-		5, 6, 7, 8,
-		1, 2, 3, 4,
+		8, 4,
+		7, 3,
+		6, 2,
+		5, 1,
 	}
 
-	f := FlipVertically()
-	img1 := image.NewGray(f.Bounds(img0.Bounds()))
-	f.Draw(img1, img0, nil)
-
-	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
-		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
-	}
-	if !comparePix(img1_exp.Pix, img1.Pix) {
-		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
-	}
-}
-
-func TestFlipHorizontally(t *testing.T) {
-	img0 := image.NewGray(image.Rect(-1, -1, 3, 1))
-	img0.Pix = []uint8{
-		1, 2, 3, 4,
-		5, 6, 7, 8,
-	}
-	img1_exp := image.NewGray(image.Rect(0, 0, 4, 2))
-	img1_exp.Pix = []uint8{
-		4, 3, 2, 1,
-		8, 7, 6, 5,
-	}
-
-	f := FlipHorizontally()
+	f := Transverse()
 	img1 := image.NewGray(f.Bounds(img0.Bounds()))
 	f.Draw(img1, img0, nil)
 
