@@ -137,30 +137,30 @@ func TestAdjustGamma(t *testing.T) {
 	for i := 0; i <= 255; i++ {
 		src.Pix[i] = uint8(i)
 	}
-	ag := AdjustGamma(2.0)
+	ag := Gamma(2.0)
 	ag.Draw(dst, src, nil)
 
 	for i := 100; i <= 150; i++ {
 		if dst.Pix[i] <= src.Pix[i] {
-			t.Errorf("AdjustGamma unexpected color")
+			t.Errorf("Gamma unexpected color")
 		}
 	}
 
-	ag = AdjustGamma(0.5)
+	ag = Gamma(0.5)
 	ag.Draw(dst, src, nil)
 
 	for i := 100; i <= 150; i++ {
 		if dst.Pix[i] >= src.Pix[i] {
-			t.Errorf("AdjustGamma unexpected color")
+			t.Errorf("Gamma unexpected color")
 		}
 	}
 
-	ag = AdjustGamma(1.0)
+	ag = Gamma(1.0)
 	ag.Draw(dst, src, nil)
 
 	for i := 100; i <= 150; i++ {
 		if dst.Pix[i] != src.Pix[i] {
-			t.Errorf("AdjustGamma unexpected color")
+			t.Errorf("Gamma unexpected color")
 		}
 	}
 }

@@ -48,10 +48,10 @@ g.Draw(dst, src)
     
 + Effects & color modifications
 
-    - AdjustGamma(gamma float32)
     - ColorspaceLinearToSRGB()
     - ColorspaceSRGBToLinear()
     - Convolution(kernel []float32, normalize, alpha, abs bool, delta float32)
+    - Gamma(gamma float32)
     - GaussianBlur(sigma float32)
     - InvertColors()
     - Maximum(ksize int, disk bool)

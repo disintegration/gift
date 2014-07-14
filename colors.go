@@ -21,52 +21,9 @@ func getFromLut(lut []float32, u float32) float32 {
 	return lut[v]
 }
 
-func mapColorChannels(dst draw.Image, src image.Image, fn func(float32) float32, options *Options) {
-	srcb := src.Bounds()
-	dstb := dst.Bounds()
-	pixGetter := newPixelGetter(src)
-	pixSetter := newPixelSetter(dst)
-
-	var useLut bool
-	var lut []float32
-	var lutSize int
-
-	it := pixGetter.imgType
-	if it == itNRGBA || it == itRGBA || it == itGray || it == itYCbCr {
-		lutSize = 0xff + 1
-	} else {
-		lutSize = 0xffff + 1
-	}
-
-	numCalculations := srcb.Dx() * srcb.Dy() * 3
-	if numCalculations > lutSize*2 {
-		useLut = true
-		lut = prepareLut(lutSize, fn)
-	} else {
-		useLut = false
-	}
-
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
-		for y := pmin; y < pmax; y++ {
-			for x := srcb.Min.X; x < srcb.Max.X; x++ {
-				px := pixGetter.getPixel(x, y)
-				if useLut {
-					px.R = getFromLut(lut, px.R)
-					px.G = getFromLut(lut, px.G)
-					px.B = getFromLut(lut, px.B)
-				} else {
-					px.R = fn(px.R)
-					px.G = fn(px.G)
-					px.B = fn(px.B)
-				}
-				pixSetter.setPixel(dstb.Min.X+x-srcb.Min.X, dstb.Min.Y+y-srcb.Min.Y, px)
-			}
-		}
-	})
-}
-
 type colorchanFilter struct {
-	fn func(float32) float32
+	fn  func(float32) float32
+	lut bool
 }
 
 func (p *colorchanFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle) {
@@ -78,7 +35,50 @@ func (p *colorchanFilter) Draw(dst draw.Image, src image.Image, options *Options
 	if options == nil {
 		options = &defaultOptions
 	}
-	mapColorChannels(dst, src, p.fn, options)
+
+	srcb := src.Bounds()
+	dstb := dst.Bounds()
+	pixGetter := newPixelGetter(src)
+	pixSetter := newPixelSetter(dst)
+
+	var useLut bool
+	var lut []float32
+
+	useLut = false
+	if p.lut {
+		var lutSize int
+
+		it := pixGetter.imgType
+		if it == itNRGBA || it == itRGBA || it == itGray || it == itYCbCr {
+			lutSize = 0xff + 1
+		} else {
+			lutSize = 0xffff + 1
+		}
+
+		numCalculations := srcb.Dx() * srcb.Dy() * 3
+		if numCalculations > lutSize*2 {
+			useLut = true
+			lut = prepareLut(lutSize, p.fn)
+		}
+	}
+
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
+		for y := pmin; y < pmax; y++ {
+			for x := srcb.Min.X; x < srcb.Max.X; x++ {
+				px := pixGetter.getPixel(x, y)
+				if useLut {
+					px.R = getFromLut(lut, px.R)
+					px.G = getFromLut(lut, px.G)
+					px.B = getFromLut(lut, px.B)
+				} else {
+					px.R = p.fn(px.R)
+					px.G = p.fn(px.G)
+					px.B = p.fn(px.B)
+				}
+				pixSetter.setPixel(dstb.Min.X+x-srcb.Min.X, dstb.Min.Y+y-srcb.Min.Y, px)
+			}
+		}
+	})
 }
 
 // InvertColors creates a filter that negates the colors of an image.
@@ -87,6 +87,7 @@ func InvertColors() Filter {
 		fn: func(x float32) float32 {
 			return 1.0 - x
 		},
+		lut: false,
 	}
 }
 
@@ -100,6 +101,7 @@ func ColorspaceSRGBToLinear() Filter {
 				return float32(math.Pow(float64((x+0.055)/1.055), 2.4))
 			}
 		},
+		lut: true,
 	}
 }
 
@@ -113,17 +115,19 @@ func ColorspaceLinearToSRGB() Filter {
 				return float32(1.055*math.Pow(float64(x), 1.0/2.4) - 0.055)
 			}
 		},
+		lut: true,
 	}
 }
 
-// AdjustGamma creates a filter that performs a gamma correction on an image.
-// Gamma parameter must be positive. Gamma = 1.0 gives the original image.
-// Gamma less than 1.0 darkens the image and gamma greater than 1.0 lightens it. .
-func AdjustGamma(gamma float32) Filter {
+// Gamma creates a filter that performs a gamma correction on an image.
+// The gamma parameter must be positive. Gamma = 1.0 gives the original image.
+// Gamma less than 1.0 darkens the image and gamma greater than 1.0 lightens it.
+func Gamma(gamma float32) Filter {
 	e := 1.0 / math.Max(float64(gamma), 0.0001)
 	return &colorchanFilter{
 		fn: func(x float32) float32 {
 			return float32(math.Pow(float64(x), e))
 		},
+		lut: true,
 	}
 }
