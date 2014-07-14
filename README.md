@@ -20,8 +20,8 @@ http://godoc.org/github.com/disintegration/gift
 ```go
 // 1. Create a new GIFT and add some filters:
 g := gift.New(
-  gift.Resize(800, 0, gift.LanczosResampling),
-  gift.AdjustGamma(0.9),
+    gift.Resize(800, 0, gift.LanczosResampling),
+    gift.UnsharpMask(1.0, 1.0, 0.0),
 )
 
 // 2. Create a new image of the corresponding size.
@@ -46,10 +46,12 @@ g.Draw(dst, src)
     - Transpose()
     - Transverse()
     
-+ Effects & color modifications
++ Adjustments & effects
 
+    - Brightness(percentage float32)
     - ColorspaceLinearToSRGB()
     - ColorspaceSRGBToLinear()
+    - Contrast(percentage float32)
     - Convolution(kernel []float32, normalize, alpha, abs bool, delta float32)
     - Gamma(gamma float32)
     - GaussianBlur(sigma float32)
@@ -58,5 +60,6 @@ g.Draw(dst, src)
     - Mean(ksize int, disk bool)
     - Median(ksize int, disk bool)
     - Minimum(ksize int, disk bool)
+    - Sigmoid(midpoint, factor float32)
     - UnsharpMask(sigma, amount, thresold float32)
 

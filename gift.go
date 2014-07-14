@@ -7,8 +7,8 @@ Basic usage:
 	// 1. Create a new GIFT and add some filters:
 
 	g := gift.New(
-	  gift.Resize(800, 0, gift.LanczosResampling),
-	  gift.AdjustGamma(0.9),
+	    gift.Resize(800, 0, gift.LanczosResampling),
+	    gift.UnsharpMask(1.0, 1.0, 0.0),
 	)
 
 	// 2. Create a new image of the corresponding size.
@@ -16,7 +16,7 @@ Basic usage:
 
 	dst := image.NewRGBA(g.Bounds(src.Bounds()))
 
-	// 3. Apply filters to src and store the result in dst:
+	// 3. Use Draw func to apply the filters to src and store the result in dst:
 
 	g.Draw(dst, src)
 

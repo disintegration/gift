@@ -73,6 +73,15 @@ func maxf32(x, y float32) float32 {
 	}
 	return y
 }
+func powf32(x, y float32) float32 {
+	return float32(math.Pow(float64(x), float64(y)))
+}
+func logf32(x float32) float32 {
+	return float32(math.Log(float64(x)))
+}
+func expf32(x float32) float32 {
+	return float32(math.Exp(float64(x)))
+}
 
 // in-place quick sort for []float32
 func qsortf32(data []float32) {

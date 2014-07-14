@@ -362,7 +362,7 @@ func (p *gausssianBlurFilter) Draw(dst draw.Image, src image.Image, options *Opt
 // Example:
 //
 //	g := gift.New(
-//		gift.GaussianBlur(3.5),
+//		gift.GaussianBlur(1.5),
 //	)
 //	dst := image.NewRGBA(src.Bounds())
 //	g.Draw(dst, src)
@@ -438,7 +438,7 @@ func (p *unsharpMaskFilter) Draw(dst draw.Image, src image.Image, options *Optio
 // Example:
 //
 //	g := gift.New(
-//		gift.UnsharpMask(3.5, 1.0, 0.0),
+//		gift.UnsharpMask(1.0, 1.0, 0.0),
 //	)
 //	dst := image.NewRGBA(src.Bounds())
 //	g.Draw(dst, src)
