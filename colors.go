@@ -81,8 +81,8 @@ func (p *colorchanFilter) Draw(dst draw.Image, src image.Image, options *Options
 	})
 }
 
-// InvertColors creates a filter that negates the colors of an image.
-func InvertColors() Filter {
+// Invert creates a filter that negates the colors of an image.
+func Invert() Filter {
 	return &colorchanFilter{
 		fn: func(x float32) float32 {
 			return 1.0 - x

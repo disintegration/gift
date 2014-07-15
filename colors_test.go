@@ -34,12 +34,12 @@ func TestLut(t *testing.T) {
 	}
 }
 
-func TestInvertColors(t *testing.T) {
+func TestInvert(t *testing.T) {
 	src := image.NewGray(image.Rect(0, 0, 256, 1))
 	for i := 0; i <= 255; i++ {
 		src.Pix[i] = uint8(i)
 	}
-	g := New(InvertColors())
+	g := New(Invert())
 	dst := image.NewGray(g.Bounds(src.Bounds()))
 	g.Draw(dst, src)
 
