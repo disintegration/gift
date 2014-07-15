@@ -192,3 +192,98 @@ func TestTransverse(t *testing.T) {
 		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
 	}
 }
+
+func TestCrop(t *testing.T) {
+	testData := []struct {
+		desc           string
+		r              image.Rectangle
+		srcb, dstb     image.Rectangle
+		srcPix, dstPix []uint8
+	}{
+		{
+			"crop (0, 0, 0, 0)",
+			image.Rect(0, 0, 0, 0),
+			image.Rect(-1, -1, 4, 2),
+			image.Rect(0, 0, 0, 0),
+			[]uint8{
+				0x00, 0x40, 0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0, 0xB0, 0x60,
+				0x00, 0x80, 0x00, 0x80, 0x00,
+			},
+			[]uint8{},
+		},
+		{
+			"crop (1, 1, -1, -1)",
+			image.Rectangle{image.Pt(1, 1), image.Pt(-1, -1)},
+			image.Rect(-1, -1, 4, 2),
+			image.Rect(0, 0, 0, 0),
+			[]uint8{
+				0x00, 0x40, 0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0, 0xB0, 0x60,
+				0x00, 0x80, 0x00, 0x80, 0x00,
+			},
+			[]uint8{},
+		},
+		{
+			"crop (-1, 0, 3, 2)",
+			image.Rect(-1, 0, 3, 2),
+			image.Rect(-1, -1, 4, 2),
+			image.Rect(0, 0, 4, 2),
+			[]uint8{
+				0x00, 0x40, 0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0, 0xB0, 0x60,
+				0x00, 0x80, 0x00, 0x80, 0x00,
+			},
+			[]uint8{
+				0x60, 0xB0, 0xA0, 0xB0,
+				0x00, 0x80, 0x00, 0x80,
+			},
+		},
+		{
+			"crop (-100, -100, 2, 2)",
+			image.Rect(-100, -100, 2, 2),
+			image.Rect(-1, -1, 4, 2),
+			image.Rect(0, 0, 3, 3),
+			[]uint8{
+				0x00, 0x40, 0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0, 0xB0, 0x60,
+				0x00, 0x80, 0x00, 0x80, 0x00,
+			},
+			[]uint8{
+				0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0,
+				0x00, 0x80, 0x00,
+			},
+		},
+		{
+			"crop (-100, -100, 100, 100)",
+			image.Rect(-100, -100, 100, 100),
+			image.Rect(-1, -1, 4, 2),
+			image.Rect(0, 0, 5, 3),
+			[]uint8{
+				0x00, 0x40, 0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0, 0xB0, 0x60,
+				0x00, 0x80, 0x00, 0x80, 0x00,
+			},
+			[]uint8{
+				0x00, 0x40, 0x00, 0x40, 0x00,
+				0x60, 0xB0, 0xA0, 0xB0, 0x60,
+				0x00, 0x80, 0x00, 0x80, 0x00,
+			},
+		},
+	}
+
+	for _, d := range testData {
+		src := image.NewGray(d.srcb)
+		src.Pix = d.srcPix
+
+		f := Crop(d.r)
+		dst := image.NewGray(f.Bounds(src.Bounds()))
+		f.Draw(dst, src, nil)
+
+		if !checkBoundsAndPix(dst.Bounds(), d.dstb, dst.Pix, d.dstPix) {
+			t.Errorf("test [%s] failed: %#v, %#v", d.desc, dst.Bounds(), dst.Pix)
+		}
+	}
+
+}

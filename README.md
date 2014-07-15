@@ -37,6 +37,7 @@ g.Draw(dst, src)
 
 + Transformations
 
+    - Crop(rect image.Rectangle)
     - FlipHorizontal()
     - FlipVertical()
     - Resize(width, height int, resampling Resampling)

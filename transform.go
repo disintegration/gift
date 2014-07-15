@@ -17,7 +17,24 @@ const (
 	ttTransverse
 )
 
-func transform(dst draw.Image, src image.Image, tt transformType, options *Options) {
+type transformFilter struct {
+	tt transformType
+}
+
+func (p *transformFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle) {
+	if p.tt == ttRotate90 || p.tt == ttRotate270 || p.tt == ttTranspose || p.tt == ttTransverse {
+		dstBounds = image.Rect(0, 0, srcBounds.Dy(), srcBounds.Dx())
+	} else {
+		dstBounds = image.Rect(0, 0, srcBounds.Dx(), srcBounds.Dy())
+	}
+	return
+}
+
+func (p *transformFilter) Draw(dst draw.Image, src image.Image, options *Options) {
+	if options == nil {
+		options = &defaultOptions
+	}
+
 	srcb := src.Bounds()
 	dstb := dst.Bounds()
 
@@ -28,7 +45,7 @@ func transform(dst draw.Image, src image.Image, tt transformType, options *Optio
 		for srcy := pmin; srcy < pmax; srcy++ {
 			for srcx := srcb.Min.X; srcx < srcb.Max.X; srcx++ {
 				var dstx, dsty int
-				switch tt {
+				switch p.tt {
 				case ttRotate90:
 					dstx = dstb.Min.X + srcy - srcb.Min.Y
 					dsty = dstb.Min.Y + srcb.Max.X - srcx - 1
@@ -55,26 +72,6 @@ func transform(dst draw.Image, src image.Image, tt transformType, options *Optio
 			}
 		}
 	})
-}
-
-type transformFilter struct {
-	tt transformType
-}
-
-func (p *transformFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle) {
-	if p.tt == ttRotate90 || p.tt == ttRotate270 || p.tt == ttTranspose || p.tt == ttTransverse {
-		dstBounds = image.Rect(0, 0, srcBounds.Dy(), srcBounds.Dx())
-	} else {
-		dstBounds = image.Rect(0, 0, srcBounds.Dx(), srcBounds.Dy())
-	}
-	return
-}
-
-func (p *transformFilter) Draw(dst draw.Image, src image.Image, options *Options) {
-	if options == nil {
-		options = &defaultOptions
-	}
-	transform(dst, src, p.tt, options)
 }
 
 // Rotate90 creates a filter that rotates an image 90 degrees counter-clockwise.
@@ -123,5 +120,51 @@ func Transpose() Filter {
 func Transverse() Filter {
 	return &transformFilter{
 		tt: ttTransverse,
+	}
+}
+
+type cropFilter struct {
+	rect image.Rectangle
+}
+
+func (p *cropFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle) {
+	b := srcBounds.Intersect(p.rect)
+	return b.Sub(b.Min)
+}
+
+func (p *cropFilter) Draw(dst draw.Image, src image.Image, options *Options) {
+	if options == nil {
+		options = &defaultOptions
+	}
+
+	srcb := src.Bounds().Intersect(p.rect)
+	dstb := dst.Bounds()
+	pixGetter := newPixelGetter(src)
+	pixSetter := newPixelSetter(dst)
+
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
+		for srcy := pmin; srcy < pmax; srcy++ {
+			for srcx := srcb.Min.X; srcx < srcb.Max.X; srcx++ {
+				dstx := dstb.Min.X + srcx - srcb.Min.X
+				dsty := dstb.Min.Y + srcy - srcb.Min.Y
+				pixSetter.setPixel(dstx, dsty, pixGetter.getPixel(srcx, srcy))
+			}
+		}
+	})
+}
+
+// Crop creates a filter that crops the specified rectangular region from an image.
+//
+// Example:
+//
+//	g := gift.New(
+//		gift.Crop(image.Rect(100, 100, 200, 200)),
+//	)
+//	dst := image.NewRGBA(g.Bounds(src.Bounds()))
+//	g.Draw(dst, src)
+//
+func Crop(rect image.Rectangle) Filter {
+	return &cropFilter{
+		rect: rect,
 	}
 }
