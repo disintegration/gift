@@ -62,6 +62,7 @@ g.Draw(dst, src)
     - Mean(ksize int, disk bool)
     - Median(ksize int, disk bool)
     - Minimum(ksize int, disk bool)
+    - Sepia()
     - Sigmoid(midpoint, factor float32)
     - UnsharpMask(sigma, amount, thresold float32)
 

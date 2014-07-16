@@ -242,12 +242,24 @@ func (p *colorFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 	})
 }
 
-// Grayscale creates a filter that produces grayscale version of an image.
+// Grayscale creates a filter that produces a grayscale version of an image.
 func Grayscale() Filter {
 	return &colorFilter{
 		fn: func(px pixel) pixel {
 			y := 0.299*px.R + 0.587*px.G + 0.114*px.B
 			return pixel{y, y, y, px.A}
+		},
+	}
+}
+
+// Sepia creates a filter that produces a sepia-toned version of an image.
+func Sepia() Filter {
+	return &colorFilter{
+		fn: func(px pixel) pixel {
+			r := 0.393*px.R + 0.769*px.G + 0.189*px.B
+			g := 0.349*px.R + 0.686*px.G + 0.168*px.B
+			b := 0.272*px.R + 0.534*px.G + 0.131*px.B
+			return pixel{r, g, b, px.A}
 		},
 	}
 }
