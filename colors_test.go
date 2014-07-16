@@ -522,7 +522,7 @@ func TestGrayscale(t *testing.T) {
 			[]uint8{},
 		},
 		{
-			"grayscale 2x2",
+			"grayscale 2x3",
 			image.Rect(-1, -1, 1, 2),
 			image.Rect(0, 0, 2, 3),
 			[]uint8{
@@ -567,7 +567,7 @@ func TestSepia(t *testing.T) {
 			[]uint8{},
 		},
 		{
-			"sepia 2x2",
+			"sepia 2x3",
 			image.Rect(-1, -1, 1, 2),
 			image.Rect(0, 0, 2, 3),
 			[]uint8{
