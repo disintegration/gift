@@ -40,62 +40,62 @@ type pixelGetter struct {
 }
 
 func newPixelGetter(img image.Image) (p *pixelGetter) {
-	switch img0 := img.(type) {
+	switch img := img.(type) {
 	case *image.NRGBA:
 		p = &pixelGetter{
 			imgType:   itNRGBA,
-			imgBounds: img0.Bounds(),
-			imgNRGBA:  img0,
+			imgBounds: img.Bounds(),
+			imgNRGBA:  img,
 		}
 
 	case *image.NRGBA64:
 		p = &pixelGetter{
 			imgType:    itNRGBA64,
-			imgBounds:  img0.Bounds(),
-			imgNRGBA64: img0,
+			imgBounds:  img.Bounds(),
+			imgNRGBA64: img,
 		}
 
 	case *image.RGBA:
 		p = &pixelGetter{
 			imgType:   itRGBA,
-			imgBounds: img0.Bounds(),
-			imgRGBA:   img0,
+			imgBounds: img.Bounds(),
+			imgRGBA:   img,
 		}
 
 	case *image.RGBA64:
 		p = &pixelGetter{
 			imgType:   itRGBA64,
-			imgBounds: img0.Bounds(),
-			imgRGBA64: img0,
+			imgBounds: img.Bounds(),
+			imgRGBA64: img,
 		}
 
 	case *image.Gray:
 		p = &pixelGetter{
 			imgType:   itGray,
-			imgBounds: img0.Bounds(),
-			imgGray:   img0,
+			imgBounds: img.Bounds(),
+			imgGray:   img,
 		}
 
 	case *image.Gray16:
 		p = &pixelGetter{
 			imgType:   itGray16,
-			imgBounds: img0.Bounds(),
-			imgGray16: img0,
+			imgBounds: img.Bounds(),
+			imgGray16: img,
 		}
 
 	case *image.YCbCr:
 		p = &pixelGetter{
 			imgType:   itYCbCr,
-			imgBounds: img0.Bounds(),
-			imgYCbCr:  img0,
+			imgBounds: img.Bounds(),
+			imgYCbCr:  img,
 		}
 
 	case *image.Paletted:
 		p = &pixelGetter{
 			imgType:     itPaletted,
-			imgBounds:   img0.Bounds(),
-			imgPaletted: img0,
-			imgPalette:  convertPalette(img0.Palette),
+			imgBounds:   img.Bounds(),
+			imgPaletted: img,
+			imgPalette:  convertPalette(img.Palette),
 		}
 		return
 
@@ -288,47 +288,47 @@ type pixelSetter struct {
 }
 
 func newPixelSetter(img draw.Image) (p *pixelSetter) {
-	switch img0 := img.(type) {
+	switch img := img.(type) {
 	case *image.NRGBA:
 		p = &pixelSetter{
 			imgType:   itNRGBA,
-			imgBounds: img0.Bounds(),
-			imgNRGBA:  img0,
+			imgBounds: img.Bounds(),
+			imgNRGBA:  img,
 		}
 
 	case *image.NRGBA64:
 		p = &pixelSetter{
 			imgType:    itNRGBA64,
-			imgBounds:  img0.Bounds(),
-			imgNRGBA64: img0,
+			imgBounds:  img.Bounds(),
+			imgNRGBA64: img,
 		}
 
 	case *image.RGBA:
 		p = &pixelSetter{
 			imgType:   itRGBA,
-			imgBounds: img0.Bounds(),
-			imgRGBA:   img0,
+			imgBounds: img.Bounds(),
+			imgRGBA:   img,
 		}
 
 	case *image.RGBA64:
 		p = &pixelSetter{
 			imgType:   itRGBA64,
-			imgBounds: img0.Bounds(),
-			imgRGBA64: img0,
+			imgBounds: img.Bounds(),
+			imgRGBA64: img,
 		}
 
 	case *image.Gray:
 		p = &pixelSetter{
 			imgType:   itGray,
-			imgBounds: img0.Bounds(),
-			imgGray:   img0,
+			imgBounds: img.Bounds(),
+			imgGray:   img,
 		}
 
 	case *image.Gray16:
 		p = &pixelSetter{
 			imgType:   itGray16,
-			imgBounds: img0.Bounds(),
-			imgGray16: img0,
+			imgBounds: img.Bounds(),
+			imgGray16: img,
 		}
 
 	default:
