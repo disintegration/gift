@@ -212,3 +212,42 @@ func Brightness(percentage float32) Filter {
 		lut: false,
 	}
 }
+
+type colorFilter struct {
+	fn func(pixel) pixel
+}
+
+func (p *colorFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle) {
+	dstBounds = image.Rect(0, 0, srcBounds.Dx(), srcBounds.Dy())
+	return
+}
+
+func (p *colorFilter) Draw(dst draw.Image, src image.Image, options *Options) {
+	if options == nil {
+		options = &defaultOptions
+	}
+
+	srcb := src.Bounds()
+	dstb := dst.Bounds()
+	pixGetter := newPixelGetter(src)
+	pixSetter := newPixelSetter(dst)
+
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
+		for y := pmin; y < pmax; y++ {
+			for x := srcb.Min.X; x < srcb.Max.X; x++ {
+				px := pixGetter.getPixel(x, y)
+				pixSetter.setPixel(dstb.Min.X+x-srcb.Min.X, dstb.Min.Y+y-srcb.Min.Y, p.fn(px))
+			}
+		}
+	})
+}
+
+// Grayscale creates a filter that produces grayscale version of an image.
+func Grayscale() Filter {
+	return &colorFilter{
+		fn: func(px pixel) pixel {
+			y := 0.299*px.R + 0.587*px.G + 0.114*px.B
+			return pixel{y, y, y, px.A}
+		},
+	}
+}
