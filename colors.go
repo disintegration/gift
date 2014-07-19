@@ -263,3 +263,122 @@ func Sepia() Filter {
 		},
 	}
 }
+
+func convertHSLToRGB(h, s, l float32) (float32, float32, float32) {
+	if s == 0.0 {
+		return l, l, l
+	}
+
+	_v := func(p, q, t float32) float32 {
+		if t < 0.0 {
+			t += 1.0
+		}
+		if t > 1.0 {
+			t -= 1.0
+		}
+		if t < 1.0/6.0 {
+			return p + (q-p)*6.0*t
+		}
+		if t < 1.0/2.0 {
+			return q
+		}
+		if t < 2.0/3.0 {
+			return p + (q-p)*(2.0/3.0-t)*6.0
+		}
+		return p
+	}
+
+	var p, q float32
+	if l < 0.5 {
+		q = l * (1.0 + s)
+	} else {
+		q = l + s - l*s
+	}
+	p = 2.0*l - q
+
+	r := _v(p, q, h+1.0/3.0)
+	g := _v(p, q, h)
+	b := _v(p, q, h-1.0/3.0)
+
+	return r, g, b
+}
+
+func convertRGBToHSL(r, g, b float32) (float32, float32, float32) {
+	max := maxf32(r, maxf32(g, b))
+	min := minf32(r, minf32(g, b))
+
+	l := (max + min) / 2.0
+
+	if max == min {
+		return 0.0, 0.0, l
+	}
+
+	var h, s float32
+	d := max - min
+	if l > 0.5 {
+		s = d / (2.0 - max - min)
+	} else {
+		s = d / (max + min)
+	}
+
+	if r == max {
+		h = (g - b) / d
+		if g < b {
+			h += 6.0
+		}
+	} else if g == max {
+		h = (b-r)/d + 2.0
+	} else {
+		h = (r-g)/d + 4.0
+	}
+	h /= 6.0
+
+	return h, s, l
+}
+
+// Hue creates a filter that rotates the hue of an image.
+// The percentage parameter must be in range (-100, 100). The percentage = 0 gives the original image.
+func Hue(percentage float32) Filter {
+	if percentage == 0 {
+		return &copyimageFilter{}
+	}
+	p := minf32(maxf32(percentage, -100.0), 100.0) / 200.0
+	if p < 0.0 {
+		p += 1.0
+	}
+	return &colorFilter{
+		fn: func(px pixel) pixel {
+			h, s, l := convertRGBToHSL(px.R, px.G, px.B)
+			h = h + p
+			if h > 1.0 {
+				h -= 1.0
+			}
+			r, g, b := convertHSLToRGB(h, s, l)
+			return pixel{r, g, b, px.A}
+		},
+	}
+}
+
+// Saturation creates a filter that changes the saturation of an image.
+// The percentage parameter must be in range (-100, 100). The percentage = 0 gives the original image.
+func Saturation(percentage float32) Filter {
+	if percentage == 0 {
+		return &copyimageFilter{}
+	}
+	p := minf32(maxf32(percentage, -100.0), 100.0) / 100.0
+	if p > 0 {
+		p *= 2
+	}
+	p += 1
+	return &colorFilter{
+		fn: func(px pixel) pixel {
+			h, s, l := convertRGBToHSL(px.R, px.G, px.B)
+			s *= p
+			if s > 1 {
+				s = 1
+			}
+			r, g, b := convertHSLToRGB(h, s, l)
+			return pixel{r, g, b, px.A}
+		},
+	}
+}

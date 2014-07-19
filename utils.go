@@ -127,28 +127,6 @@ type uvweight struct {
 	weight float32
 }
 
-// copy image from src to dst
-func copyimage(dst draw.Image, src image.Image, options *Options) {
-	if options == nil {
-		options = &defaultOptions
-	}
-
-	srcb := src.Bounds()
-	dstb := dst.Bounds()
-	pixGetter := newPixelGetter(src)
-	pixSetter := newPixelSetter(dst)
-
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
-		for srcy := pmin; srcy < pmax; srcy++ {
-			for srcx := srcb.Min.X; srcx < srcb.Max.X; srcx++ {
-				dstx := dstb.Min.X + srcx - srcb.Min.X
-				dsty := dstb.Min.Y + srcy - srcb.Min.Y
-				pixSetter.setPixel(dstx, dsty, pixGetter.getPixel(srcx, srcy))
-			}
-		}
-	})
-}
-
 // create default temp image
 func createTempImage(r image.Rectangle) draw.Image {
 	return image.NewNRGBA64(r) // use 16 bits per channel images internally
@@ -198,4 +176,37 @@ func genDisk(ksize int) []float32 {
 		}
 	}
 	return disk
+}
+
+// copy image from src to dst
+func copyimage(dst draw.Image, src image.Image, options *Options) {
+	if options == nil {
+		options = &defaultOptions
+	}
+
+	srcb := src.Bounds()
+	dstb := dst.Bounds()
+	pixGetter := newPixelGetter(src)
+	pixSetter := newPixelSetter(dst)
+
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
+		for srcy := pmin; srcy < pmax; srcy++ {
+			for srcx := srcb.Min.X; srcx < srcb.Max.X; srcx++ {
+				dstx := dstb.Min.X + srcx - srcb.Min.X
+				dsty := dstb.Min.Y + srcy - srcb.Min.Y
+				pixSetter.setPixel(dstx, dsty, pixGetter.getPixel(srcx, srcy))
+			}
+		}
+	})
+}
+
+type copyimageFilter struct{}
+
+func (p *copyimageFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle) {
+	dstBounds = image.Rect(0, 0, srcBounds.Dx(), srcBounds.Dy())
+	return
+}
+
+func (p *copyimageFilter) Draw(dst draw.Image, src image.Image, options *Options) {
+	copyimage(dst, src, options)
 }
