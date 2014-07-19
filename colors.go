@@ -337,12 +337,12 @@ func convertRGBToHSL(r, g, b float32) (float32, float32, float32) {
 }
 
 // Hue creates a filter that rotates the hue of an image.
-// The percentage parameter must be in range (-100, 100). The percentage = 0 gives the original image.
-func Hue(percentage float32) Filter {
-	if percentage == 0 {
+// The shift parameter must be in range (-180, 180). The shift = 0 gives the original image.
+func Hue(shift float32) Filter {
+	if shift == 0 {
 		return &copyimageFilter{}
 	}
-	p := minf32(maxf32(percentage, -100.0), 100.0) / 200.0
+	p := minf32(maxf32(shift, -180.0), 180.0) / 360.0
 	if p < 0.0 {
 		p += 1.0
 	}

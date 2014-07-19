@@ -632,8 +632,8 @@ func TestHue(t *testing.T) {
 			},
 		},
 		{
-			"hue -50",
-			-50,
+			"hue -90",
+			-90,
 			image.Rect(-1, -1, 1, 3),
 			image.Rect(0, 0, 2, 4),
 			[]uint8{
@@ -650,8 +650,8 @@ func TestHue(t *testing.T) {
 			},
 		},
 		{
-			"hue 50",
-			50,
+			"hue 90",
+			90,
 			image.Rect(-1, -1, 1, 3),
 			image.Rect(0, 0, 2, 4),
 			[]uint8{
