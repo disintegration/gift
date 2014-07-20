@@ -318,7 +318,7 @@ Original image | Filtered image
 gift.Convolution(
     []float32{
         -1, -1, 0,
-        -1, 0, 1,
+        -1, 1, 1,
         0, 1, 1,
     },
     false, false, false, 0.0,
