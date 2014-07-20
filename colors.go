@@ -177,15 +177,18 @@ func Sigmoid(midpoint, factor float32) Filter {
 // The percentage parameter must be in range (-100, 100). The percentage = 0 gives the original image.
 // The percentage = -100 gives solid grey image. The percentage = 100 gives an overcontrasted image.
 func Contrast(percentage float32) Filter {
-	percentage = minf32(maxf32(percentage, -100.0), 100.0)
-	v := (100.0 + percentage) / 100.0
+	if percentage == 0 {
+		return &copyimageFilter{}
+	}
+
+	p := 1 + minf32(maxf32(percentage, -100.0), 100.0)/100.0
 
 	return &colorchanFilter{
 		fn: func(x float32) float32 {
-			if 0 <= v && v <= 1 {
-				return 0.5 + (x-0.5)*v
-			} else if 1 < v && v < 2 {
-				return 0.5 + (x-0.5)*(1/(2.0-v))
+			if 0 <= p && p <= 1 {
+				return 0.5 + (x-0.5)*p
+			} else if 1 < p && p < 2 {
+				return 0.5 + (x-0.5)*(1/(2.0-p))
 			} else {
 				if x < 0.5 {
 					return 0.0
@@ -202,8 +205,11 @@ func Contrast(percentage float32) Filter {
 // The percentage parameter must be in range (-100, 100). The percentage = 0 gives the original image.
 // The percentage = -100 gives solid black image. The percentage = 100 gives solid white image.
 func Brightness(percentage float32) Filter {
-	percentage = minf32(maxf32(percentage, -100.0), 100.0)
-	shift := percentage / 100.0
+	if percentage == 0 {
+		return &copyimageFilter{}
+	}
+
+	shift := minf32(maxf32(percentage, -100.0), 100.0) / 100.0
 
 	return &colorchanFilter{
 		fn: func(x float32) float32 {
@@ -360,16 +366,13 @@ func Hue(shift float32) Filter {
 }
 
 // Saturation creates a filter that changes the saturation of an image.
-// The percentage parameter must be in range (-100, 100). The percentage = 0 gives the original image.
+// The percentage parameter must be in range (-100, 500). The percentage = 0 gives the original image.
 func Saturation(percentage float32) Filter {
 	if percentage == 0 {
 		return &copyimageFilter{}
 	}
-	p := minf32(maxf32(percentage, -100.0), 100.0) / 100.0
-	if p > 0 {
-		p *= 2
-	}
-	p += 1
+	p := 1 + minf32(maxf32(percentage, -100.0), 500.0)/100.0
+
 	return &colorFilter{
 		fn: func(px pixel) pixel {
 			h, s, l := convertRGBToHSL(px.R, px.G, px.B)

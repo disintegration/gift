@@ -1,5 +1,7 @@
 # GO IMAGE FILTERING TOOLKIT (GIFT)
 
+*BETA*
+
 *Package gift provides a set of useful image processing filters.*
 
 

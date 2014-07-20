@@ -736,8 +736,8 @@ func TestSaturation(t *testing.T) {
 			},
 		},
 		{
-			"saturation 50",
-			50,
+			"saturation 100",
+			100,
 			image.Rect(-1, -1, 1, 3),
 			image.Rect(0, 0, 2, 4),
 			[]uint8{
