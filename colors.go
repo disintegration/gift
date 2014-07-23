@@ -273,6 +273,7 @@ func Sepia(adjust int) Filter {
 	return &colorFilter{
 		fn: func(px pixel) pixel {
 			adjustAmount := float32(adjust) / 100.0
+			adjustAmount = minf32(maxf32(adjustAmount, 0.0), 1.0)
 			calculatedR := (px.R * (1.0 - (0.607 * adjustAmount))) +
 				(px.G * (0.769 * adjustAmount)) +
 				(px.B * (0.189 * adjustAmount))
