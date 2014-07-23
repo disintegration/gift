@@ -259,7 +259,7 @@ func Grayscale() Filter {
 }
 
 // Sepia creates a filter that changes the tint of an image and returns the adjusted image.
-// It takes a parameter for how much the image should be adjusted, typically in the range (0, 100)
+// It takes a parameter for how much the image should be adjusted, typically in the range (0.0, 1.0)
 //
 // Example:
 //
@@ -269,11 +269,10 @@ func Grayscale() Filter {
 //	dst := image.NewRGBA(src.Bounds())
 //	g.Draw(dst, src)
 //
-func Sepia(adjust int) Filter {
+func Sepia(adjust float32) Filter {
 	return &colorFilter{
 		fn: func(px pixel) pixel {
-			adjustAmount := float32(adjust) / 100.0
-			adjustAmount = minf32(maxf32(adjustAmount, 0.0), 1.0)
+			adjustAmount := minf32(maxf32(adjust, 0.0), 1.0)
 			calculatedR := (px.R * (1.0 - (0.607 * adjustAmount))) +
 				(px.G * (0.769 * adjustAmount)) +
 				(px.B * (0.189 * adjustAmount))

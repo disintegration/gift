@@ -587,7 +587,7 @@ func TestSepia(t *testing.T) {
 		src := image.NewNRGBA(d.srcb)
 		src.Pix = d.srcPix
 
-		f := Sepia(100)
+		f := Sepia(1.0)
 		dst := image.NewNRGBA(f.Bounds(src.Bounds()))
 		f.Draw(dst, src, nil)
 

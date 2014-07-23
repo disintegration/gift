@@ -268,7 +268,7 @@ Original image | Filtered image
 
 ##### Sepia, amount=100
 ```go
-gift.Sepia(100)
+gift.Sepia(1.0)
 ```
 Original image | Filtered image
 --- | ---
