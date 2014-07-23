@@ -279,9 +279,9 @@ func Sepia(adjust int) Filter {
 			calculatedG := (px.R * (0.349 * adjustAmount)) +
 				(px.G * (1.0 - (0.314 * adjustAmount))) +
 				(px.B * (0.168 * adjustAmount))
-			calculatedB := (px.R * (0.349 * adjustAmount)) +
-				(px.G * (1.0 - (0.314 * adjustAmount))) +
-				(px.B * (float32(0.168) * adjustAmount))
+			calculatedB := (px.R * (0.272 * adjustAmount)) +
+				(px.G * (0.534 * adjustAmount)) +
+				(px.B * (1.0 - (float32(0.869) * adjustAmount)))
 			r := float32(math.Min(255.0, float64(calculatedR)))
 			g := float32(math.Min(255.0, float64(calculatedG)))
 			b := float32(math.Min(255.0, float64(calculatedB)))
