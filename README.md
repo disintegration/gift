@@ -266,7 +266,7 @@ Original image | Filtered image
 --- | ---
 ![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_grayscale.jpg)
 
-##### Sepia, amount=100
+##### Sepia, amount=1.0
 ```go
 gift.Sepia(1.0)
 ```
