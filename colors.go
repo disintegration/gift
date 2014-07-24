@@ -259,7 +259,7 @@ func Grayscale() Filter {
 }
 
 // Sepia creates a filter that changes the tint of an image and returns the adjusted image.
-// It takes a parameter for how much the image should be adjusted, typically in the range (0.0, 1.0)
+// It takes a parameter for how much the image should be adjusted, that must be in the range (0, 100)
 //
 // Example:
 //
@@ -269,22 +269,22 @@ func Grayscale() Filter {
 //	dst := image.NewRGBA(src.Bounds())
 //	g.Draw(dst, src)
 //
-func Sepia(adjust float32) Filter {
+func Sepia(percentage float32) Filter {
+	adjustAmount := minf32(maxf32(percentage, 0.0), 100.0) / 100.0
+	rr := 1.0 - 0.607*adjustAmount
+	rg := 0.769 * adjustAmount
+	rb := 0.189 * adjustAmount
+	gr := 0.349 * adjustAmount
+	gg := 1.0 - 0.314*adjustAmount
+	gb := 0.168 * adjustAmount
+	br := 0.272 * adjustAmount
+	bg := 0.534 * adjustAmount
+	bb := 1.0 - 0.869*adjustAmount
 	return &colorFilter{
 		fn: func(px pixel) pixel {
-			adjustAmount := minf32(maxf32(adjust, 0.0), 1.0)
-			calculatedR := (px.R * (1.0 - (0.607 * adjustAmount))) +
-				(px.G * (0.769 * adjustAmount)) +
-				(px.B * (0.189 * adjustAmount))
-			calculatedG := (px.R * (0.349 * adjustAmount)) +
-				(px.G * (1.0 - (0.314 * adjustAmount))) +
-				(px.B * (0.168 * adjustAmount))
-			calculatedB := (px.R * (0.272 * adjustAmount)) +
-				(px.G * (0.534 * adjustAmount)) +
-				(px.B * (1.0 - (float32(0.869) * adjustAmount)))
-			r := float32(math.Min(255.0, float64(calculatedR)))
-			g := float32(math.Min(255.0, float64(calculatedG)))
-			b := float32(math.Min(255.0, float64(calculatedB)))
+			r := px.R*rr + px.G*rg + px.B*rb
+			g := px.R*gr + px.G*gg + px.B*gb
+			b := px.R*br + px.G*bg + px.B*bb
 			return pixel{r, g, b, px.A}
 		},
 	}
