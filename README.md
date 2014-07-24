@@ -67,7 +67,7 @@ g.Draw(dst, src)
     - Median(ksize int, disk bool)
     - Minimum(ksize int, disk bool)
     - Saturation(percentage float32)
-    - Sepia()
+    - Sepia(amount float32)
     - Sigmoid(midpoint, factor float32)
     - UnsharpMask(sigma, amount, thresold float32)
 
@@ -266,9 +266,9 @@ Original image | Filtered image
 --- | ---
 ![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_grayscale.jpg)
 
-##### Sepia
+##### Sepia, amount=1.0
 ```go
-gift.Sepia()
+gift.Sepia(1.0)
 ```
 Original image | Filtered image
 --- | ---
