@@ -324,7 +324,7 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 // Rotate creates a filter that rotates an image by the given angle counter-clockwise.
 // The angle parameter is the rotation angle in degrees.
 // The backgroundColor parameter specifies the color of the uncovered zone after the rotation.
-// The interpolation parameter specifies the inperpolation method.
+// The interpolation parameter specifies the interpolation method.
 // Supported interpolation methods: NearestNeighborInterpolation, LinearInterpolation, CubicInterpolation.
 //
 // Example:
