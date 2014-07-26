@@ -123,9 +123,9 @@ Original image | Filtered image
 --- | ---
 ![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_rotate_270.jpg)
 
-##### Rotate 30 degrees, white background, linear interpolation
+##### Rotate 30 degrees, white background, cubic interpolation
 ```go
-gift.Rotate(30, color.White, gift.LinearInterpolation)
+gift.Rotate(30, color.White, gift.CubicInterpolation)
 ```
 Original image | Filtered image
 --- | ---

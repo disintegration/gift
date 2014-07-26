@@ -129,6 +129,7 @@ type Interpolation int
 const (
 	NearestNeighborInterpolation Interpolation = iota
 	LinearInterpolation
+	CubicInterpolation
 )
 
 func rotatePoint(x, y, asin, acos float32) (float32, float32) {
@@ -211,9 +212,60 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 				xf, yf = float32(srcb.Min.X)+xf+srcxoff, float32(srcb.Min.Y)+yf+srcyoff
 
 				switch p.interpolation {
+				case CubicInterpolation:
+					var calc bool
+					var pxs [16]pixel
+					var cfs [16]float32
+					var px pixel
+
+					x0, y0 := int(floorf32(xf)), int(floorf32(yf))
+					xq, yq := xf-float32(x0), yf-float32(y0)
+
+					for i := 0; i < 4; i++ {
+						for j := 0; j < 4; j++ {
+							pt := image.Pt(x0+j-1, y0+i-1)
+							if pt.In(srcb) {
+								pxs[i*4+j] = pixGetter.getPixel(pt.X, pt.Y)
+								calc = true
+							} else {
+								pxs[i*4+j] = bgpx
+							}
+						}
+					}
+
+					if !calc {
+						pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, bgpx)
+						continue
+					}
+
+					cfs[0] = (1.0 / 36.0) * xq * yq * (xq - 1) * (xq - 2) * (yq - 1) * (yq - 2)
+					cfs[1] = -(1.0 / 12.0) * yq * (xq - 1) * (xq - 2) * (xq + 1) * (yq - 1) * (yq - 2)
+					cfs[2] = (1.0 / 12.0) * xq * yq * (xq + 1) * (xq - 2) * (yq - 1) * (yq - 2)
+					cfs[3] = -(1.0 / 36.0) * xq * yq * (xq - 1) * (xq + 1) * (yq - 1) * (yq - 2)
+					cfs[4] = -(1.0 / 12.0) * xq * (xq - 1) * (xq - 2) * (yq - 1) * (yq - 2) * (yq + 1)
+					cfs[5] = 0.25 * (xq - 1) * (xq - 2) * (xq + 1) * (yq - 1) * (yq - 2) * (yq + 1)
+					cfs[6] = -0.25 * xq * (xq + 1) * (xq - 2) * (yq - 1) * (yq - 2) * (yq + 1)
+					cfs[7] = (1.0 / 12.0) * xq * (xq - 1) * (xq + 1) * (yq - 1) * (yq - 2) * (yq + 1)
+					cfs[8] = (1.0 / 12.0) * xq * yq * (xq - 1) * (xq - 2) * (yq + 1) * (yq - 2)
+					cfs[9] = -0.25 * yq * (xq - 1) * (xq - 2) * (xq + 1) * (yq + 1) * (yq - 2)
+					cfs[10] = 0.25 * xq * yq * (xq + 1) * (xq - 2) * (yq + 1) * (yq - 2)
+					cfs[11] = -(1.0 / 12.0) * xq * yq * (xq - 1) * (xq + 1) * (yq + 1) * (yq - 2)
+					cfs[12] = -(1.0 / 36.0) * xq * yq * (xq - 1) * (xq - 2) * (yq - 1) * (yq + 1)
+					cfs[13] = (1.0 / 12.0) * yq * (xq - 1) * (xq - 2) * (xq + 1) * (yq - 1) * (yq + 1)
+					cfs[14] = -(1.0 / 12.0) * xq * yq * (xq + 1) * (xq - 2) * (yq - 1) * (yq + 1)
+					cfs[15] = (1.0 / 36.0) * xq * yq * (xq - 1) * (xq + 1) * (yq - 1) * (yq + 1)
+
+					for i := range pxs {
+						px.R += pxs[i].R * cfs[i]
+						px.G += pxs[i].G * cfs[i]
+						px.B += pxs[i].B * cfs[i]
+						px.A += pxs[i].A * cfs[i]
+					}
+
+					pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, px)
+
 				case LinearInterpolation:
 					var calc bool
-					var pts [4]image.Point
 					var pxs [4]pixel
 					var cfs [4]float32
 					var px pixel
@@ -221,17 +273,15 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 					x0, y0 := int(floorf32(xf)), int(floorf32(yf))
 					xq, yq := xf-float32(x0), yf-float32(y0)
 
-					pts[0] = image.Pt(x0, y0)
-					pts[1] = image.Pt(x0+1, y0)
-					pts[2] = image.Pt(x0, y0+1)
-					pts[3] = image.Pt(x0+1, y0+1)
-
-					for i, pt := range pts {
-						if pt.In(srcb) {
-							pxs[i] = pixGetter.getPixel(pt.X, pt.Y)
-							calc = true
-						} else {
-							pxs[i] = bgpx
+					for i := 0; i < 2; i++ {
+						for j := 0; j < 2; j++ {
+							pt := image.Pt(x0+j, y0+i)
+							if pt.In(srcb) {
+								pxs[i*2+j] = pixGetter.getPixel(pt.X, pt.Y)
+								calc = true
+							} else {
+								pxs[i*2+j] = bgpx
+							}
 						}
 					}
 
@@ -255,13 +305,14 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 					pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, px)
 
 				default:
+					var px pixel
 					x0, y0 := int(floorf32(xf+0.5)), int(floorf32(yf+0.5))
 					if image.Pt(x0, y0).In(srcb) {
-						px := pixGetter.getPixel(x0, y0)
-						pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, px)
+						px = pixGetter.getPixel(x0, y0)
 					} else {
-						pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, bgpx)
+						px = bgpx
 					}
+					pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, px)
 				}
 			}
 		}
@@ -274,7 +325,7 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 // The angle parameter is the rotation angle in degrees.
 // The backgroundColor parameter specifies the color of the uncovered zone after the rotation.
 // The interpolation parameter specifies the inperpolation method.
-// Supported interpolation methods: NearestNeighborInterpolation, LinearInterpolation.
+// Supported interpolation methods: NearestNeighborInterpolation, LinearInterpolation, CubicInterpolation.
 //
 // Example:
 //
