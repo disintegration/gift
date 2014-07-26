@@ -364,7 +364,7 @@ func TestRotate(t *testing.T) {
 			},
 		},
 		{
-			"rotate 3x3 45 black linear",
+			"rotate 5x5 45 black linear",
 			45, color.Black, LinearInterpolation,
 			image.Rect(-1, -1, 4, 4),
 			image.Rect(0, 0, 8, 8),
