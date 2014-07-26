@@ -4,7 +4,6 @@
 
 Pure Go. No external dependencies outside of the Go standard library.
 
-*BETA*
 
 ### INSTALLATION / UPDATING
 
