@@ -102,7 +102,7 @@ func precomputeResamplingWeights(dstSize, srcSize int, resampling Resampling) []
 	return result
 }
 
-func resizeLine(dstBuf *[]pixel, srcBuf []pixel, weights [][]uweight) {
+func resizeLine(dstBuf []pixel, srcBuf []pixel, weights [][]uweight) {
 	for dstu := 0; dstu < len(weights); dstu++ {
 		var r, g, b, a float32
 		for _, iw := range weights[dstu] {
@@ -112,7 +112,7 @@ func resizeLine(dstBuf *[]pixel, srcBuf []pixel, weights [][]uweight) {
 			b += c.B * iw.weight
 			a += c.A * iw.weight
 		}
-		(*dstBuf)[dstu] = pixel{r, g, b, a}
+		dstBuf[dstu] = pixel{r, g, b, a}
 	}
 }
 
@@ -130,7 +130,7 @@ func resizeHorizontal(dst draw.Image, src image.Image, w int, resampling Resampl
 		dstBuf := make([]pixel, w)
 		for srcy := pmin; srcy < pmax; srcy++ {
 			pixGetter.getPixelRow(srcy, &srcBuf)
-			resizeLine(&dstBuf, srcBuf, weights)
+			resizeLine(dstBuf, srcBuf, weights)
 			pixSetter.setPixelRow(dstb.Min.Y+srcy-srcb.Min.Y, dstBuf)
 		}
 	})
@@ -150,7 +150,7 @@ func resizeVertical(dst draw.Image, src image.Image, h int, resampling Resamplin
 		dstBuf := make([]pixel, h)
 		for srcx := pmin; srcx < pmax; srcx++ {
 			pixGetter.getPixelColumn(srcx, &srcBuf)
-			resizeLine(&dstBuf, srcBuf, weights)
+			resizeLine(dstBuf, srcBuf, weights)
 			pixSetter.setPixelColumn(dstb.Min.X+srcx-srcb.Min.X, dstBuf)
 		}
 	})

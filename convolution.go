@@ -229,7 +229,7 @@ func prepareConvolutionWeights1d(kernel []float32) (int, []uweight) {
 }
 
 // calculate pixels for one line according to weights
-func convolveLine(dstBuf *[]pixel, srcBuf []pixel, weights []uweight) {
+func convolveLine(dstBuf []pixel, srcBuf []pixel, weights []uweight) {
 	max := len(srcBuf) - 1
 	if max < 0 {
 		return
@@ -249,7 +249,7 @@ func convolveLine(dstBuf *[]pixel, srcBuf []pixel, weights []uweight) {
 			b += c.B * w.weight
 			a += c.A * w.weight
 		}
-		(*dstBuf)[dstu] = pixel{r, g, b, a}
+		dstBuf[dstu] = pixel{r, g, b, a}
 	}
 }
 
@@ -272,7 +272,7 @@ func convolve1dv(dst draw.Image, src image.Image, kernel []float32, options *Opt
 		dstBuf := make([]pixel, srcb.Dy())
 		for x := pmin; x < pmax; x++ {
 			pixGetter.getPixelColumn(x, &srcBuf)
-			convolveLine(&dstBuf, srcBuf, weights)
+			convolveLine(dstBuf, srcBuf, weights)
 			pixSetter.setPixelColumn(dstb.Min.X+x-srcb.Min.X, dstBuf)
 		}
 	})
@@ -297,7 +297,7 @@ func convolve1dh(dst draw.Image, src image.Image, kernel []float32, options *Opt
 		dstBuf := make([]pixel, srcb.Dx())
 		for y := pmin; y < pmax; y++ {
 			pixGetter.getPixelRow(y, &srcBuf)
-			convolveLine(&dstBuf, srcBuf, weights)
+			convolveLine(dstBuf, srcBuf, weights)
 			pixSetter.setPixelRow(dstb.Min.Y+y-srcb.Min.Y, dstBuf)
 		}
 	})

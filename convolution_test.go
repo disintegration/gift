@@ -221,7 +221,7 @@ func TestConvolution(t *testing.T) {
 	convolve1dv(image.NewGray(image.Rect(0, 0, 1, 1)), image.NewGray(image.Rect(0, 0, 1, 1)), []float32{}, nil)
 	convolve1dh(image.NewGray(image.Rect(0, 0, 0, 0)), image.NewGray(image.Rect(0, 0, 0, 0)), []float32{}, nil)
 	convolve1dv(image.NewGray(image.Rect(0, 0, 0, 0)), image.NewGray(image.Rect(0, 0, 0, 0)), []float32{}, nil)
-	convolveLine(&[]pixel{}, []pixel{}, []uweight{})
+	convolveLine([]pixel{}, []pixel{}, []uweight{})
 	prepareConvolutionWeights1d([]float32{0, 0})
 	prepareConvolutionWeights1d([]float32{})
 }
