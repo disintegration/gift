@@ -127,9 +127,14 @@ Original image | Filtered image
 ```go
 gift.Rotate(30, color.Black, gift.LinearInterpolation)
 ```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_rotate_30.jpg)
+
+Original image | 
+--- | 
+![original](http://disintegration.github.io/gift/examples/original.jpg) | 
+
+Filtered image | 
+--- | 
+![filtered](http://disintegration.github.io/gift/examples/example_rotate_30.jpg) | 
 
 ##### Flip horizontal
 ```go
