@@ -2,6 +2,7 @@ package gift
 
 import (
 	"image"
+	"image/color"
 	"image/draw"
 )
 
@@ -120,6 +121,174 @@ func Transpose() Filter {
 func Transverse() Filter {
 	return &transformFilter{
 		tt: ttTransverse,
+	}
+}
+
+type Interpolation int
+
+const (
+	NearestNeighborInterpolation Interpolation = iota
+	LinearInterpolation
+)
+
+func rotatePoint(x, y, asin, acos float32) (float32, float32) {
+	newx := float32(x)*acos - float32(y)*asin
+	newy := float32(x)*asin + float32(y)*acos
+	return newx, newy
+}
+
+func calcRotatedSize(w, h int, angle float32) (int, int) {
+	if w <= 0 || h <= 0 {
+		return 0, 0
+	}
+
+	xoff := float32(w)/2 - 0.5
+	yoff := float32(h)/2 - 0.5
+
+	asin, acos := sincosf32(angle)
+	x1, y1 := rotatePoint(0-xoff, 0-yoff, asin, acos)
+	x2, y2 := rotatePoint(float32(w-1)-xoff, 0-yoff, asin, acos)
+	x3, y3 := rotatePoint(float32(w-1)-xoff, float32(h-1)-yoff, asin, acos)
+	x4, y4 := rotatePoint(0-xoff, float32(h-1)-yoff, asin, acos)
+
+	minx := minf32(x1, minf32(x2, minf32(x3, x4)))
+	maxx := maxf32(x1, maxf32(x2, maxf32(x3, x4)))
+	miny := minf32(y1, minf32(y2, minf32(y3, y4)))
+	maxy := maxf32(y1, maxf32(y2, maxf32(y3, y4)))
+
+	neww := maxx - minx + 1
+	if neww-floorf32(neww) > 0.01 {
+		neww += 2
+	}
+	newh := maxy - miny + 1
+	if newh-floorf32(newh) > 0.01 {
+		newh += 2
+	}
+	return int(neww), int(newh)
+}
+
+type rotateFilter struct {
+	angle         float32
+	bgcolor       color.Color
+	interpolation Interpolation
+}
+
+func (p *rotateFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle) {
+	w, h := calcRotatedSize(srcBounds.Dx(), srcBounds.Dy(), p.angle)
+	dstBounds = image.Rect(0, 0, w, h)
+	return
+}
+
+func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
+	if options == nil {
+		options = &defaultOptions
+	}
+
+	srcb := src.Bounds()
+	dstb := dst.Bounds()
+
+	w, h := calcRotatedSize(srcb.Dx(), srcb.Dy(), p.angle)
+	if w <= 0 || h <= 0 {
+		return
+	}
+
+	srcxoff := float32(srcb.Dx())/2 - 0.5
+	srcyoff := float32(srcb.Dy())/2 - 0.5
+	dstxoff := float32(w)/2 - 0.5
+	dstyoff := float32(h)/2 - 0.5
+
+	bgpx := pixelclr(p.bgcolor)
+	asin, acos := sincosf32(p.angle)
+
+	pixGetter := newPixelGetter(src)
+	pixSetter := newPixelSetter(dst)
+
+	parallelize(options.Parallelization, 0, h, func(pmin, pmax int) {
+		for y := pmin; y < pmax; y++ {
+			for x := 0; x < w; x++ {
+
+				xf, yf := rotatePoint(float32(x)-dstxoff, float32(y)-dstyoff, asin, acos)
+				xf, yf = float32(srcb.Min.X)+xf+srcxoff, float32(srcb.Min.Y)+yf+srcyoff
+
+				switch p.interpolation {
+				case LinearInterpolation:
+					var calc bool
+					var pts [4]image.Point
+					var pxs [4]pixel
+					var cfs [4]float32
+					var px pixel
+
+					x0, y0 := int(floorf32(xf)), int(floorf32(yf))
+					xq, yq := xf-float32(x0), yf-float32(y0)
+
+					pts[0] = image.Pt(x0, y0)
+					pts[1] = image.Pt(x0+1, y0)
+					pts[2] = image.Pt(x0, y0+1)
+					pts[3] = image.Pt(x0+1, y0+1)
+
+					for i, pt := range pts {
+						if pt.In(srcb) {
+							pxs[i] = pixGetter.getPixel(pt.X, pt.Y)
+							calc = true
+						} else {
+							pxs[i] = bgpx
+						}
+					}
+
+					if !calc {
+						pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, bgpx)
+						continue
+					}
+
+					cfs[0] = (1 - xq) * (1 - yq)
+					cfs[1] = xq * (1 - yq)
+					cfs[2] = (1 - xq) * yq
+					cfs[3] = xq * yq
+
+					for i := range pxs {
+						px.R += pxs[i].R * cfs[i]
+						px.G += pxs[i].G * cfs[i]
+						px.B += pxs[i].B * cfs[i]
+						px.A += pxs[i].A * cfs[i]
+					}
+
+					pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, px)
+
+				default:
+					x0, y0 := int(floorf32(xf+0.5)), int(floorf32(yf+0.5))
+					if image.Pt(x0, y0).In(srcb) {
+						px := pixGetter.getPixel(x0, y0)
+						pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, px)
+					} else {
+						pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, bgpx)
+					}
+				}
+			}
+		}
+	})
+
+	return
+}
+
+// Rotate creates a filter that rotates an image by the given angle counter-clockwise.
+// The angle parameter is the rotation angle in degrees.
+// The backgroundColor parameter specifies the color of the uncovered zone after the rotation.
+// The interpolation parameter specifies the inperpolation method.
+// Supported interpolation methods: NearestNeighborInterpolation, LinearInterpolation.
+//
+// Example:
+//
+//	g := gift.New(
+//		gift.Rotate(45, color.Black, gift.LinearInterpolation),
+//	)
+//	dst := image.NewRGBA(g.Bounds(src.Bounds()))
+//	g.Draw(dst, src)
+//
+func Rotate(angle float32, backgroundColor color.Color, interpolation Interpolation) Filter {
+	return &rotateFilter{
+		angle:         angle,
+		bgcolor:       backgroundColor,
+		interpolation: interpolation,
 	}
 }
 

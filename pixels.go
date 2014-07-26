@@ -139,6 +139,27 @@ func convertPalette(p []color.Color) []pixel {
 	return pnew
 }
 
+func pixelclr(c color.Color) (px pixel) {
+	r16, g16, b16, a16 := c.RGBA()
+	switch a16 {
+	case 0:
+		px = pixel{0.0, 0.0, 0.0, 0.0}
+	case 65535:
+		r := float32(r16) * qf16
+		g := float32(g16) * qf16
+		b := float32(b16) * qf16
+		px = pixel{r, g, b, 1.0}
+	default:
+		q := float32(1.0) / float32(a16)
+		r := float32(r16) * q
+		g := float32(g16) * q
+		b := float32(b16) * q
+		a := float32(a16) * qf16
+		px = pixel{r, g, b, a}
+	}
+	return px
+}
+
 func (p *pixelGetter) getPixel(x, y int) (px pixel) {
 	switch p.imgType {
 	case itNRGBA:
@@ -222,23 +243,7 @@ func (p *pixelGetter) getPixel(x, y int) (px pixel) {
 		px = p.imgPalette[k]
 
 	case itGeneric:
-		r16, g16, b16, a16 := p.imgGeneric.At(x, y).RGBA()
-		switch a16 {
-		case 0:
-			px = pixel{0.0, 0.0, 0.0, 0.0}
-		case 65535:
-			r := float32(r16) * qf16
-			g := float32(g16) * qf16
-			b := float32(b16) * qf16
-			px = pixel{r, g, b, 1.0}
-		default:
-			q := float32(1.0) / float32(a16)
-			r := float32(r16) * q
-			g := float32(g16) * q
-			b := float32(b16) * q
-			a := float32(a16) * qf16
-			px = pixel{r, g, b, a}
-		}
+		px = pixelclr(p.imgGeneric.At(x, y))
 	}
 	return
 }

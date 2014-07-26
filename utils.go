@@ -82,6 +82,13 @@ func logf32(x float32) float32 {
 func expf32(x float32) float32 {
 	return float32(math.Exp(float64(x)))
 }
+func sincosf32(a float32) (float32, float32) {
+	sin, cos := math.Sincos(math.Pi * float64(a) / 180)
+	return float32(sin), float32(cos)
+}
+func floorf32(x float32) float32 {
+	return float32(math.Floor(float64(x)))
+}
 
 // in-place quick sort for []float32
 func qsortf32(data []float32) {

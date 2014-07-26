@@ -44,6 +44,7 @@ g.Draw(dst, src)
     - FlipHorizontal()
     - FlipVertical()
     - Resize(width, height int, resampling Resampling)
+    - Rotate(angle float32, backgroundColor color.Color, interpolation Interpolation)
     - Rotate180()
     - Rotate270()
     - Rotate90()
@@ -121,6 +122,14 @@ gift.Rotate270()
 Original image | Filtered image
 --- | ---
 ![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_rotate_270.jpg)
+
+##### Rotate 30 degrees, black background, linear interpolation
+```go
+gift.Rotate(30, color.Black, gift.LinearInterpolation)
+```
+Original image | Filtered image
+--- | ---
+![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_rotate_30.jpg)
 
 ##### Flip horizontal
 ```go
