@@ -258,8 +258,8 @@ func Grayscale() Filter {
 	}
 }
 
-// Sepia creates a filter that changes the tint of an image and returns the adjusted image.
-// It takes a parameter for how much the image should be adjusted, that must be in the range (0, 100)
+// Sepia creates a filter that produces a sepia-toned version of an image.
+// The percentage parameter specifies how much the image should be adjusted. It must be in the range (0, 100)
 //
 // Example:
 //
