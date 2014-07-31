@@ -53,6 +53,8 @@ g.Draw(dst, src)
 + Adjustments & effects
 
     - Brightness(percentage float32)
+    - ColorBalance(percentageRed, percentageGreen, percentageBlue float32)
+    - Colorize(hue, saturation, percentage float32)
     - ColorspaceLinearToSRGB()
     - ColorspaceSRGBToLinear()
     - Contrast(percentage float32)
@@ -289,6 +291,22 @@ gift.Invert()
 Original image | Filtered image
 --- | ---
 ![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_invert.jpg)
+
+##### Colorize, blue, saturation=100%
+```go
+gift.Colorize(240, 100, 100)
+```
+Original image | Filtered image
+--- | ---
+![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_colorize.jpg)
+
+##### Color balance, +20% red, -20% green
+```go
+gift.ColorBalance(20, -20, 0)
+```
+Original image | Filtered image
+--- | ---
+![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_colorbalance.jpg)
 
 ##### Local mean, disc shape, size=5
 ```go
