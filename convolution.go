@@ -192,7 +192,7 @@ func (p *convolutionFilter) Draw(dst draw.Image, src image.Image, options *Optio
 //			false, false, true, 0.0,
 //		),
 //	)
-//	dst := image.NewRGBA(src.Bounds())
+//	dst := image.NewRGBA(g.Bounds(src.Bounds()))
 //	g.Draw(dst, src)
 //
 func Convolution(kernel []float32, normalize, alpha, abs bool, delta float32) Filter {
@@ -364,7 +364,7 @@ func (p *gausssianBlurFilter) Draw(dst draw.Image, src image.Image, options *Opt
 //	g := gift.New(
 //		gift.GaussianBlur(1.5),
 //	)
-//	dst := image.NewRGBA(src.Bounds())
+//	dst := image.NewRGBA(g.Bounds(src.Bounds()))
 //	g.Draw(dst, src)
 //
 func GaussianBlur(sigma float32) Filter {
@@ -440,7 +440,7 @@ func (p *unsharpMaskFilter) Draw(dst draw.Image, src image.Image, options *Optio
 //	g := gift.New(
 //		gift.UnsharpMask(1.0, 1.0, 0.0),
 //	)
-//	dst := image.NewRGBA(src.Bounds())
+//	dst := image.NewRGBA(g.Bounds(src.Bounds()))
 //	g.Draw(dst, src)
 //
 func UnsharpMask(sigma, amount, thresold float32) Filter {

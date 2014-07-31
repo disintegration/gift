@@ -147,7 +147,7 @@ func sigmoid(a, b, x float32) float32 {
 //	g := gift.New(
 //		gift.Sigmoid(0.5, 3.0),
 //	)
-//	dst := image.NewRGBA(src.Bounds())
+//	dst := image.NewRGBA(g.Bounds(src.Bounds()))
 //	g.Draw(dst, src)
 //
 func Sigmoid(midpoint, factor float32) Filter {
@@ -266,7 +266,7 @@ func Grayscale() Filter {
 //	g := gift.New(
 //		gift.Sepia(100),
 //	)
-//	dst := image.NewRGBA(src.Bounds())
+//	dst := image.NewRGBA(g.Bounds(src.Bounds()))
 //	g.Draw(dst, src)
 //
 func Sepia(percentage float32) Filter {
