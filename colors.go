@@ -362,23 +362,27 @@ func convertRGBToHSL(r, g, b float32) (float32, float32, float32) {
 	return h, s, l
 }
 
+func normalizeHue(hue float32) float32 {
+	hue = hue - float32(int(hue))
+	if hue < 0 {
+		hue += 1
+	}
+	return hue
+}
+
 // Hue creates a filter that rotates the hue of an image.
-// The shift parameter must be in range (-180, 180). The shift = 0 gives the original image.
+// The shift parameter is the hue angle shift, typically in range (-180, 180).
+// The shift = 0 gives the original image.
 func Hue(shift float32) Filter {
-	if shift == 0 {
+	p := normalizeHue(shift / 360.0)
+	if p == 0 {
 		return &copyimageFilter{}
 	}
-	p := minf32(maxf32(shift, -180.0), 180.0) / 360.0
-	if p < 0.0 {
-		p += 1.0
-	}
+
 	return &colorFilter{
 		fn: func(px pixel) pixel {
 			h, s, l := convertRGBToHSL(px.R, px.G, px.B)
-			h = h + p
-			if h > 1.0 {
-				h -= 1.0
-			}
+			h = normalizeHue(h + p)
 			r, g, b := convertHSLToRGB(h, s, l)
 			return pixel{r, g, b, px.A}
 		},
@@ -388,10 +392,10 @@ func Hue(shift float32) Filter {
 // Saturation creates a filter that changes the saturation of an image.
 // The percentage parameter must be in range (-100, 500). The percentage = 0 gives the original image.
 func Saturation(percentage float32) Filter {
-	if percentage == 0 {
+	p := 1 + minf32(maxf32(percentage, -100.0), 500.0)/100.0
+	if p == 1 {
 		return &copyimageFilter{}
 	}
-	p := 1 + minf32(maxf32(percentage, -100.0), 500.0)/100.0
 
 	return &colorFilter{
 		fn: func(px pixel) pixel {
@@ -402,6 +406,65 @@ func Saturation(percentage float32) Filter {
 			}
 			r, g, b := convertHSLToRGB(h, s, l)
 			return pixel{r, g, b, px.A}
+		},
+	}
+}
+
+// Colorize creates a filter that produces a colorized version of an image.
+// The hue parameter is the angle on the color wheel, typically in range (0, 360).
+// The saturation parameter must be in range (0, 100).
+// The percentage parameter specifies the strength of the effect, it must be in range (0, 100).
+//
+// Example:
+//
+//	g := gift.New(
+//		gift.Colorize(240, 50, 100), // blue colorization, 50% saturation
+//	)
+//	dst := image.NewRGBA(g.Bounds(src.Bounds()))
+//	g.Draw(dst, src)
+//
+func Colorize(hue, saturation, percentage float32) Filter {
+	h := normalizeHue(hue / 360)
+	s := minf32(maxf32(saturation, 0), 100) / 100
+	p := minf32(maxf32(percentage, 0), 100) / 100
+	if p == 0 {
+		return &copyimageFilter{}
+	}
+
+	return &colorFilter{
+		fn: func(px pixel) pixel {
+			_, _, l := convertRGBToHSL(px.R, px.G, px.B)
+			r, g, b := convertHSLToRGB(h, s, l)
+			px.R += (r - px.R) * p
+			px.G += (g - px.G) * p
+			px.B += (b - px.B) * p
+			return px
+		},
+	}
+}
+
+// ColorBalance creates a filter that changes the color balance of an image.
+// The percentage parameters for each color channel (red, green, blue) must be in range (-100, 500).
+//
+// Example:
+//
+//	g := gift.New(
+//		gift.ColorBalance(20, -20, 0), // +20% red, -20% green
+//	)
+//	dst := image.NewRGBA(g.Bounds(src.Bounds()))
+//	g.Draw(dst, src)
+//
+func ColorBalance(percentageRed, percentageGreen, percentageBlue float32) Filter {
+	pr := 1 + minf32(maxf32(percentageRed, -100), 500)/100
+	pg := 1 + minf32(maxf32(percentageGreen, -100), 500)/100
+	pb := 1 + minf32(maxf32(percentageBlue, -100), 500)/100
+
+	return &colorFilter{
+		fn: func(px pixel) pixel {
+			px.R *= pr
+			px.G *= pg
+			px.B *= pb
+			return px
 		},
 	}
 }
