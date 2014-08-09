@@ -54,6 +54,7 @@ g.Draw(dst, src)
 
     - Brightness(percentage float32)
     - ColorBalance(percentageRed, percentageGreen, percentageBlue float32)
+    - ColorFunc(fn func(r0, g0, b0, a0 float32) (r, g, b, a float32))
     - Colorize(hue, saturation, percentage float32)
     - ColorspaceLinearToSRGB()
     - ColorspaceSRGBToLinear()
@@ -292,9 +293,9 @@ Original image | Filtered image
 --- | ---
 ![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_invert.jpg)
 
-##### Colorize, blue, saturation=100%
+##### Colorize, blue, saturation=50%
 ```go
-gift.Colorize(240, 100, 100)
+gift.Colorize(240, 50, 100)
 ```
 Original image | Filtered image
 --- | ---
@@ -307,6 +308,22 @@ gift.ColorBalance(20, -20, 0)
 Original image | Filtered image
 --- | ---
 ![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_colorbalance.jpg)
+
+##### Color function
+```go
+gift.ColorFunc(
+    func(r0, g0, b0, a0 float32) (r, g, b, a float32) {
+        r = 1 - r0   // invert the red channel
+        g = g0 + 0.1 // shift the green channel by 0.1
+        b = 0        // set the blue channel to 0
+        a = a0       // preserve the alpha channel
+        return
+    },
+)
+ ```
+Original image | Filtered image
+--- | ---
+![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_colorfunc.jpg)
 
 ##### Local mean, disc shape, size=5
 ```go

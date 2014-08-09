@@ -468,3 +468,32 @@ func ColorBalance(percentageRed, percentageGreen, percentageBlue float32) Filter
 		},
 	}
 }
+
+// ColorFunc creates a filter that changes the colors of an image using custom function.
+// The fn parameter specifies a function that takes red, green, blue and alpha channels of a pixel
+// as float32 values in range (0, 1) and returns the modified channel values.
+//
+// Example:
+//
+//	g := gift.New(
+//		gift.ColorFunc(
+//			func(r0, g0, b0, a0 float32) (r, g, b, a float32) {
+//				r = 1 - r0   // invert the red channel
+//				g = g0 + 0.1 // shift the green channel by 0.1
+//				b = 0        // set the blue channel to 0
+//				a = a0       // preserve the alpha channel
+//				return
+//			},
+//		),
+//	)
+//	dst := image.NewRGBA(g.Bounds(src.Bounds()))
+//	g.Draw(dst, src)
+//
+func ColorFunc(fn func(r0, g0, b0, a0 float32) (r, g, b, a float32)) Filter {
+	return &colorFilter{
+		fn: func(px pixel) pixel {
+			r, g, b, a := fn(px.R, px.G, px.B, px.A)
+			return pixel{r, g, b, a}
+		},
+	}
+}
