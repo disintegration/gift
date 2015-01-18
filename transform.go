@@ -133,8 +133,8 @@ const (
 )
 
 func rotatePoint(x, y, asin, acos float32) (float32, float32) {
-	newx := float32(x)*acos - float32(y)*asin
-	newy := float32(x)*asin + float32(y)*acos
+	newx := x*acos - y*asin
+	newy := x*asin + y*acos
 	return newx, newy
 }
 
