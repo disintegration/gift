@@ -89,6 +89,9 @@ func sincosf32(a float32) (float32, float32) {
 func floorf32(x float32) float32 {
 	return float32(math.Floor(float64(x)))
 }
+func sqrtf32(x float32) float32 {
+	return float32(math.Sqrt(float64(x)))
+}
 
 // in-place quick sort for []float32
 func qsortf32(data []float32) {

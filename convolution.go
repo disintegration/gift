@@ -181,15 +181,15 @@ func (p *convolutionFilter) Draw(dst draw.Image, src image.Image, options *Optio
 //
 // Example:
 //
-//	// Apply the vertical sobel filter to an image.
+//	// Apply the emboss filter to an image.
 //	g := gift.New(
 //		gift.Convolution(
 //			[]float32{
-//				1.0, 2.0, 1.0,
-//				0.0, 0.0, 0.0,
-//				-1.0, -2.0, -1.0,
+//				-1, -1, 0,
+//				-1, 1, 1,
+//				0, 1, 1,
 //			},
-//			false, false, true, 0.0,
+//			false, false, false, 0,
 //		),
 //	)
 //	dst := image.NewRGBA(g.Bounds(src.Bounds()))
@@ -504,5 +504,59 @@ func Mean(ksize int, disk bool) Filter {
 	return &meanFilter{
 		ksize: ksize,
 		disk:  disk,
+	}
+}
+
+type hvConvolutionFilter struct {
+	hkernel, vkernel []float32
+}
+
+func (p *hvConvolutionFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle) {
+	dstBounds = image.Rect(0, 0, srcBounds.Dx(), srcBounds.Dy())
+	return
+}
+
+func (p *hvConvolutionFilter) Draw(dst draw.Image, src image.Image, options *Options) {
+	if options == nil {
+		options = &defaultOptions
+	}
+
+	srcb := src.Bounds()
+	dstb := dst.Bounds()
+
+	if srcb.Dx() <= 0 || srcb.Dy() <= 0 {
+		return
+	}
+
+	tmph := createTempImage(srcb)
+	Convolution(p.hkernel, false, false, true, 0).Draw(tmph, src, options)
+	pixGetterH := newPixelGetter(tmph)
+
+	tmpv := createTempImage(srcb)
+	Convolution(p.vkernel, false, false, true, 0).Draw(tmpv, src, options)
+	pixGetterV := newPixelGetter(tmpv)
+
+	pixSetter := newPixelSetter(dst)
+
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
+		for y := pmin; y < pmax; y++ {
+			for x := srcb.Min.X; x < srcb.Max.X; x++ {
+				pxh := pixGetterH.getPixel(x, y)
+				pxv := pixGetterV.getPixel(x, y)
+				r := sqrtf32(pxh.R*pxh.R + pxv.R*pxv.R)
+				g := sqrtf32(pxh.G*pxh.G + pxv.G*pxv.G)
+				b := sqrtf32(pxh.B*pxh.B + pxv.B*pxv.B)
+				pixSetter.setPixel(dstb.Min.X+x-srcb.Min.X, dstb.Min.Y+y-srcb.Min.Y, pixel{r, g, b, pxh.A})
+			}
+		}
+	})
+
+}
+
+// Sobel creates a filter that applies a sobel operator to an image.
+func Sobel() Filter {
+	return &hvConvolutionFilter{
+		hkernel: []float32{-1, 0, 1, -2, 0, 2, -1, 0, 1},
+		vkernel: []float32{-1, -2, -1, 0, 0, 0, 1, 2, 1},
 	}
 }
