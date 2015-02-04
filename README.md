@@ -386,7 +386,7 @@ gift.Convolution(
 ```
 Original image | Filtered image
 --- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_convolution_edge.jpg)
+![original](http://disintegration.github.io/gift/examples/original2.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_edge.jpg)
 
 ##### Sobel operator
 ```go
