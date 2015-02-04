@@ -72,6 +72,7 @@ g.Draw(dst, src)
     - Saturation(percentage float32)
     - Sepia(percentage float32)
     - Sigmoid(midpoint, factor float32)
+    - Sobel()
     - UnsharpMask(sigma, amount, thresold float32)
 
 
