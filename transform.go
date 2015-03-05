@@ -1,9 +1,11 @@
 package gift
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
+	"math"
 )
 
 type transformType int
@@ -135,8 +137,90 @@ const (
 func rotatePoint(x, y, asin, acos float32) (float32, float32) {
 	newx := x*acos - y*asin
 	newy := x*asin + y*acos
+	//fmt.Printf(" rotating %v,%v to %v,%v \n ", x, y, newx, newy)
 	return newx, newy
 }
+
+// returns the distance between top left corner of original
+// image and top left corner of rotated image as xDiff, yDiff
+func RotateOffSet(w, h int, angle float32) (float32, float32) {
+
+	if w <= 0 || h <= 0 {
+		return 0, 0
+	}
+
+	// find center of src rect for rotation point x0,y0
+	xoff := float32(w)/2 - 0.5
+	yoff := float32(h)/2 - 0.5
+
+	// find pre-rotation point of src top left corner
+	origx := 0 - xoff
+	origy := float32(h-1) - yoff
+
+	// find post-rotation point
+	asin, acos := sincosf32(angle)
+	newx, newy := rotatePoint(origx, origy, asin, acos)
+
+	// find
+
+	// find top left corner of dst rect
+	x1, y1 := rotatePoint(0-xoff, 0-yoff, asin, acos)
+	x2, y2 := rotatePoint(float32(w-1)-xoff, 0-yoff, asin, acos)
+	x3, y3 := rotatePoint(float32(w-1)-xoff, float32(h-1)-yoff, asin, acos)
+	x4, y4 := rotatePoint(0-xoff, float32(h-1)-yoff, asin, acos)
+
+	minx := minf32(x1, minf32(x2, minf32(x3, x4)))
+	miny := minf32(y1, minf32(y2, minf32(y3, y4)))
+
+	xoffset := float32(0)
+	yoffset := float32(0)
+
+	// calculate distance between (newx,newy) and (minx,miny)
+	if angle >= 360 {
+		angle = angle - 360
+	}
+	switch {
+	case 0 <= angle && angle < 90:
+		xoffset = newx - minx
+		yoffset = float32(math.Abs(float64(newy + miny)))
+	case 90 <= angle && angle < 180:
+		//xoffset = float32(math.Abs(float64(newx + minx)))
+		xoffset = float32(math.Abs(float64(minx)) - math.Abs(float64(newx)))
+		yoffset = float32(math.Abs(float64(newy)) + math.Abs(float64(miny)))
+		fmt.Printf(" minx, minyy %v,%v newx, newy %v,%v ", minx, miny, newx, newy)
+	case 180 <= angle && angle < 270:
+		xoffset = newx - minx
+		yoffset = float32(math.Abs(float64(newy + miny)))
+	case 270 <= angle && angle < 360:
+		xoffset = newx - minx
+		yoffset = 0 //newy - miny
+	}
+
+	//fmt.Printf("minx,miny: %v,%v ", minx, miny)
+	//fmt.Printf("xoffset,yoffset: %v,%v ", xoffset, yoffset)
+
+	//fmt.Printf("offset x,y: %v,%v ", offset_x, offset_y)
+	return float32(xoffset), float32(yoffset)
+
+}
+
+// func RotateOffSet(w, h int, angle float32) (float32, float32) {
+// 	// find middle of src and after rotation dst rects
+// 	srcxoff := float32(srcb.Dx())/2 - 0.5
+// 	srcyoff := float32(srcb.Dy())/2 - 0.5
+// 	dstxoff := float32(w)/2 - 0.5
+// 	dstyoff := float32(h)/2 - 0.5
+
+// 	asin, acos := sincosf32(p.angle)
+
+// 	xf, yf := rotatePoint(float32(x)-dstxoff, float32(y)-dstyoff, asin, acos)
+// 	fmt.Printf("xf,yf: %v,%v ", xf, xf)
+// 	xf, yf = float32(srcb.Min.X)+xf+srcxoff, float32(srcb.Min.Y)+yf+srcyoff
+// 	fmt.Printf("xf,yf: %v,%v ", xf, xf)
+
+// 	return xf, yf
+
+// }
 
 func calcRotatedSize(w, h int, angle float32) (int, int) {
 	if w <= 0 || h <= 0 {
@@ -147,6 +231,8 @@ func calcRotatedSize(w, h int, angle float32) (int, int) {
 	yoff := float32(h)/2 - 0.5
 
 	asin, acos := sincosf32(angle)
+	//fmt.Printf("asin, acos: %v,%v ", asin, acos)
+
 	x1, y1 := rotatePoint(0-xoff, 0-yoff, asin, acos)
 	x2, y2 := rotatePoint(float32(w-1)-xoff, 0-yoff, asin, acos)
 	x3, y3 := rotatePoint(float32(w-1)-xoff, float32(h-1)-yoff, asin, acos)
@@ -156,6 +242,14 @@ func calcRotatedSize(w, h int, angle float32) (int, int) {
 	maxx := maxf32(x1, maxf32(x2, maxf32(x3, x4)))
 	miny := minf32(y1, minf32(y2, minf32(y3, y4)))
 	maxy := maxf32(y1, maxf32(y2, maxf32(y3, y4)))
+
+	//fmt.Printf("minx,miny: %v,%v ", minx, miny)
+	//fmt.Printf("maxx,maxy: %v,%v ", maxx, maxy)
+
+	// fmt.Printf("x1,y1: %v,%v ", x1, y1)
+	// fmt.Printf("x2,y2: %v,%v ", x2, y2)
+	// fmt.Printf("x3,y3: %v,%v ", x3, y3)
+	// fmt.Printf("x4,y4: %v,%v \n", x4, y4)
 
 	neww := maxx - minx + 1
 	if neww-floorf32(neww) > 0.01 {
@@ -193,6 +287,7 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 		return
 	}
 
+	// find middle of src and dst rects
 	srcxoff := float32(srcb.Dx())/2 - 0.5
 	srcyoff := float32(srcb.Dy())/2 - 0.5
 	dstxoff := float32(w)/2 - 0.5
