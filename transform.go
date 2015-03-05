@@ -170,7 +170,7 @@ func RotateOffSet(w, h int, angle float32) (float32, float32) {
 	x4, y4 := rotatePoint(0-xoff, float32(h-1)-yoff, asin, acos)
 
 	minx := minf32(x1, minf32(x2, minf32(x3, x4)))
-	miny := minf32(y1, minf32(y2, minf32(y3, y4)))
+	maxy := maxf32(y1, maxf32(y2, maxf32(y3, y4)))
 
 	xoffset := float32(0)
 	yoffset := float32(0)
@@ -182,18 +182,19 @@ func RotateOffSet(w, h int, angle float32) (float32, float32) {
 	switch {
 	case 0 <= angle && angle < 90:
 		xoffset = newx - minx
-		yoffset = float32(math.Abs(float64(newy + miny)))
+		yoffset = maxy - newy
 	case 90 <= angle && angle < 180:
-		//xoffset = float32(math.Abs(float64(newx + minx)))
-		xoffset = float32(math.Abs(float64(minx)) - math.Abs(float64(newx)))
-		yoffset = float32(math.Abs(float64(newy)) + math.Abs(float64(miny)))
-		fmt.Printf(" minx, minyy %v,%v newx, newy %v,%v ", minx, miny, newx, newy)
+		xoffset = float32(math.Abs(float64(newx - minx)))
+		//xoffset = minx - newx
+		yoffset = maxy - newy
+		fmt.Printf("minx,maxy %v,%v  newx,newy %v,%v ", minx, maxy, newx, newy)
 	case 180 <= angle && angle < 270:
 		xoffset = newx - minx
-		yoffset = float32(math.Abs(float64(newy + miny)))
+		yoffset = float32(math.Abs(float64(newy - maxy)))
+		fmt.Printf("minx,maxy %v,%v  newx,newy %v,%v ", minx, maxy, newx, newy)
 	case 270 <= angle && angle < 360:
 		xoffset = newx - minx
-		yoffset = 0 //newy - miny
+		yoffset = newy - maxy
 	}
 
 	//fmt.Printf("minx,miny: %v,%v ", minx, miny)
