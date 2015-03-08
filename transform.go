@@ -1,7 +1,6 @@
 package gift
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -137,7 +136,6 @@ const (
 func rotatePoint(x, y, asin, acos float32) (float32, float32) {
 	newx := x*acos - y*asin
 	newy := x*asin + y*acos
-	//fmt.Printf(" rotating %v,%v to %v,%v \n ", x, y, newx, newy)
 	return newx, newy
 }
 
@@ -161,8 +159,6 @@ func RotateOffSet(w, h int, angle float32) (float32, float32) {
 	asin, acos := sincosf32(angle)
 	newx, newy := rotatePoint(origx, origy, asin, acos)
 
-	// find
-
 	// find top left corner of dst rect
 	x1, y1 := rotatePoint(0-xoff, 0-yoff, asin, acos)
 	x2, y2 := rotatePoint(float32(w-1)-xoff, 0-yoff, asin, acos)
@@ -185,43 +181,18 @@ func RotateOffSet(w, h int, angle float32) (float32, float32) {
 		yoffset = maxy - newy
 	case 90 <= angle && angle < 180:
 		xoffset = float32(math.Abs(float64(newx - minx)))
-		//xoffset = minx - newx
 		yoffset = maxy - newy
-		fmt.Printf("minx,maxy %v,%v  newx,newy %v,%v ", minx, maxy, newx, newy)
 	case 180 <= angle && angle < 270:
 		xoffset = newx - minx
 		yoffset = float32(math.Abs(float64(newy - maxy)))
-		fmt.Printf("minx,maxy %v,%v  newx,newy %v,%v ", minx, maxy, newx, newy)
 	case 270 <= angle && angle < 360:
 		xoffset = newx - minx
 		yoffset = newy - maxy
 	}
 
-	//fmt.Printf("minx,miny: %v,%v ", minx, miny)
-	//fmt.Printf("xoffset,yoffset: %v,%v ", xoffset, yoffset)
-
-	//fmt.Printf("offset x,y: %v,%v ", offset_x, offset_y)
 	return float32(xoffset), float32(yoffset)
 
 }
-
-// func RotateOffSet(w, h int, angle float32) (float32, float32) {
-// 	// find middle of src and after rotation dst rects
-// 	srcxoff := float32(srcb.Dx())/2 - 0.5
-// 	srcyoff := float32(srcb.Dy())/2 - 0.5
-// 	dstxoff := float32(w)/2 - 0.5
-// 	dstyoff := float32(h)/2 - 0.5
-
-// 	asin, acos := sincosf32(p.angle)
-
-// 	xf, yf := rotatePoint(float32(x)-dstxoff, float32(y)-dstyoff, asin, acos)
-// 	fmt.Printf("xf,yf: %v,%v ", xf, xf)
-// 	xf, yf = float32(srcb.Min.X)+xf+srcxoff, float32(srcb.Min.Y)+yf+srcyoff
-// 	fmt.Printf("xf,yf: %v,%v ", xf, xf)
-
-// 	return xf, yf
-
-// }
 
 func calcRotatedSize(w, h int, angle float32) (int, int) {
 	if w <= 0 || h <= 0 {
@@ -232,7 +203,6 @@ func calcRotatedSize(w, h int, angle float32) (int, int) {
 	yoff := float32(h)/2 - 0.5
 
 	asin, acos := sincosf32(angle)
-	//fmt.Printf("asin, acos: %v,%v ", asin, acos)
 
 	x1, y1 := rotatePoint(0-xoff, 0-yoff, asin, acos)
 	x2, y2 := rotatePoint(float32(w-1)-xoff, 0-yoff, asin, acos)
@@ -243,14 +213,6 @@ func calcRotatedSize(w, h int, angle float32) (int, int) {
 	maxx := maxf32(x1, maxf32(x2, maxf32(x3, x4)))
 	miny := minf32(y1, minf32(y2, minf32(y3, y4)))
 	maxy := maxf32(y1, maxf32(y2, maxf32(y3, y4)))
-
-	//fmt.Printf("minx,miny: %v,%v ", minx, miny)
-	//fmt.Printf("maxx,maxy: %v,%v ", maxx, maxy)
-
-	// fmt.Printf("x1,y1: %v,%v ", x1, y1)
-	// fmt.Printf("x2,y2: %v,%v ", x2, y2)
-	// fmt.Printf("x3,y3: %v,%v ", x3, y3)
-	// fmt.Printf("x4,y4: %v,%v \n", x4, y4)
 
 	neww := maxx - minx + 1
 	if neww-floorf32(neww) > 0.01 {
