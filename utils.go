@@ -93,6 +93,20 @@ func sqrtf32(x float32) float32 {
 	return float32(math.Sqrt(float64(x)))
 }
 
+// int math
+func minint(x, y int) int {
+	if x < y {
+		return x
+	}
+	return y
+}
+func maxint(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
+}
+
 // in-place quick sort for []float32
 func qsortf32(data []float32) {
 	var qsortidx func([]float32, int, int)

@@ -388,3 +388,86 @@ func Crop(rect image.Rectangle) Filter {
 		rect: rect,
 	}
 }
+
+// Anchor is the anchor point for image cropping.
+type Anchor int
+
+const (
+	CenterAnchor Anchor = iota
+	TopLeftAnchor
+	TopAnchor
+	TopRightAnchor
+	LeftAnchor
+	RightAnchor
+	BottomLeftAnchor
+	BottomAnchor
+	BottomRightAnchor
+)
+
+func anchorPt(b image.Rectangle, w, h int, anchor Anchor) image.Point {
+	var x, y int
+	switch anchor {
+	case TopLeftAnchor:
+		x = b.Min.X
+		y = b.Min.Y
+	case TopAnchor:
+		x = b.Min.X + (b.Dx()-w)/2
+		y = b.Min.Y
+	case TopRightAnchor:
+		x = b.Max.X - w
+		y = b.Min.Y
+	case LeftAnchor:
+		x = b.Min.X
+		y = b.Min.Y + (b.Dy()-h)/2
+	case RightAnchor:
+		x = b.Max.X - w
+		y = b.Min.Y + (b.Dy()-h)/2
+	case BottomLeftAnchor:
+		x = b.Min.X
+		y = b.Max.Y - h
+	case BottomAnchor:
+		x = b.Min.X + (b.Dx()-w)/2
+		y = b.Max.Y - h
+	case BottomRightAnchor:
+		x = b.Max.X - w
+		y = b.Max.Y - h
+	default:
+		x = b.Min.X + (b.Dx()-w)/2
+		y = b.Min.Y + (b.Dy()-h)/2
+	}
+	return image.Pt(x, y)
+}
+
+type cropToSizeFilter struct {
+	w, h   int
+	anchor Anchor
+}
+
+func (p *cropToSizeFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle) {
+	if p.w <= 0 || p.h <= 0 {
+		return image.Rect(0, 0, 0, 0)
+	}
+	pt := anchorPt(srcBounds, p.w, p.h, p.anchor)
+	r := image.Rect(0, 0, p.w, p.h).Add(pt)
+	b := srcBounds.Intersect(r)
+	return b.Sub(b.Min)
+}
+
+func (p *cropToSizeFilter) Draw(dst draw.Image, src image.Image, options *Options) {
+	if p.w <= 0 || p.h <= 0 {
+		return
+	}
+	pt := anchorPt(src.Bounds(), p.w, p.h, p.anchor)
+	r := image.Rect(0, 0, p.w, p.h).Add(pt)
+	b := src.Bounds().Intersect(r)
+	Crop(b).Draw(dst, src, options)
+}
+
+// CropToSize creates a filter that crops an image to the specified size using the specified anchor point.
+func CropToSize(width, height int, anchor Anchor) Filter {
+	return &cropToSizeFilter{
+		w:      width,
+		h:      height,
+		anchor: anchor,
+	}
+}
