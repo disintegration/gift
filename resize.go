@@ -265,6 +265,114 @@ func Resize(width, height int, resampling Resampling) Filter {
 	}
 }
 
+type resizeToFitFilter struct {
+	width      int
+	height     int
+	resampling Resampling
+}
+
+func (p *resizeToFitFilter) Bounds(srcBounds image.Rectangle) image.Rectangle {
+	w, h := p.width, p.height
+	srcw, srch := srcBounds.Dx(), srcBounds.Dy()
+
+	if w <= 0 || h <= 0 || srcw <= 0 || srch <= 0 {
+		return image.Rect(0, 0, 0, 0)
+	}
+
+	if srcw <= w && srch <= h {
+		return image.Rect(0, 0, srcw, srch)
+	}
+
+	wratio := float64(srcw) / float64(w)
+	hratio := float64(srch) / float64(h)
+
+	var dstw, dsth int
+	if wratio > hratio {
+		dstw = w
+		dsth = minint(int(float64(srch)/wratio+0.5), h)
+	} else {
+		dsth = h
+		dstw = minint(int(float64(srcw)/hratio+0.5), w)
+	}
+
+	return image.Rect(0, 0, dstw, dsth)
+}
+
+func (p *resizeToFitFilter) Draw(dst draw.Image, src image.Image, options *Options) {
+	b := p.Bounds(src.Bounds())
+	Resize(b.Dx(), b.Dy(), p.resampling).Draw(dst, src, options)
+	return
+}
+
+// ResizeToFit creates a filter that resizes an image to fit within the specified dimensions while preserving the aspect ratio.
+// Supported resampling parameters: NearestNeighborResampling, BoxResampling, LinearResampling, CubicResampling, LanczosResampling.
+func ResizeToFit(width, height int, resampling Resampling) Filter {
+	return &resizeToFitFilter{
+		width:      width,
+		height:     height,
+		resampling: resampling,
+	}
+}
+
+type resizeToFillFilter struct {
+	width      int
+	height     int
+	anchor     Anchor
+	resampling Resampling
+}
+
+func (p *resizeToFillFilter) Bounds(srcBounds image.Rectangle) image.Rectangle {
+	w, h := p.width, p.height
+	srcw, srch := srcBounds.Dx(), srcBounds.Dy()
+
+	if w <= 0 || h <= 0 || srcw <= 0 || srch <= 0 {
+		return image.Rect(0, 0, 0, 0)
+	}
+
+	return image.Rect(0, 0, w, h)
+}
+
+func (p *resizeToFillFilter) Draw(dst draw.Image, src image.Image, options *Options) {
+	b := p.Bounds(src.Bounds())
+	w, h := b.Dx(), b.Dy()
+
+	if w <= 0 || h <= 0 {
+		return
+	}
+
+	srcw, srch := src.Bounds().Dx(), src.Bounds().Dy()
+
+	wratio := float64(srcw) / float64(w)
+	hratio := float64(srch) / float64(h)
+
+	var tmpw, tmph int
+	if wratio < hratio {
+		tmpw = w
+		tmph = maxint(int(float64(srch)/wratio+0.5), h)
+	} else {
+		tmph = h
+		tmpw = maxint(int(float64(srcw)/hratio+0.5), w)
+	}
+
+	tmp := createTempImage(image.Rect(0, 0, tmpw, tmph))
+	Resize(tmpw, tmph, p.resampling).Draw(tmp, src, options)
+	CropToSize(w, h, p.anchor).Draw(dst, tmp, options)
+
+	return
+}
+
+// ResizeToFill creates a filter that resizes an image to the smallest possible size that will cover the specified dimensions,
+// then crops the resized image to the specified dimensions using the specified anchor point.
+// Supported resampling parameters: NearestNeighborResampling, BoxResampling, LinearResampling, CubicResampling, LanczosResampling.
+func ResizeToFill(width, height int, resampling Resampling, anchor Anchor) Filter {
+	return &resizeToFillFilter{
+		width:      width,
+		height:     height,
+		anchor:     anchor,
+		resampling: resampling,
+	}
+}
+
 func init() {
 	// Nearest neighbor resampling filter.
 	NearestNeighborResampling = resamplingStruct{
