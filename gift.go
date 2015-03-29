@@ -130,3 +130,91 @@ func (g *GIFT) Draw(dst draw.Image, src image.Image) {
 		f.Draw(tmpOut, tmpIn, &g.Options)
 	}
 }
+
+// Operator is an image composition operator.
+type Operator int
+
+const (
+	CopyOperator Operator = iota
+	OverOperator
+)
+
+// DrawAt applies all the added filters to the src image and outputs the result to the dst image
+// at the specified position pt using the specified composition operator op.
+func (g *GIFT) DrawAt(dst draw.Image, src image.Image, pt image.Point, op Operator) {
+	switch op {
+	case OverOperator:
+		tb := g.Bounds(src.Bounds())
+		tb = tb.Sub(tb.Min).Add(pt)
+		tmp := createTempImage(tb)
+		g.Draw(tmp, src)
+		pixGetterDst := newPixelGetter(dst)
+		pixGetterTmp := newPixelGetter(tmp)
+		pixSetterDst := newPixelSetter(dst)
+		ib := tb.Intersect(dst.Bounds())
+		parallelize(g.Options.Parallelization, ib.Min.Y, ib.Max.Y, func(pmin, pmax int) {
+			for y := pmin; y < pmax; y++ {
+				for x := ib.Min.X; x < ib.Max.X; x++ {
+					px0 := pixGetterDst.getPixel(x, y)
+					px1 := pixGetterTmp.getPixel(x, y)
+					c1 := px1.A
+					c0 := (1 - c1) * px0.A
+					cs := c0 + c1
+					c0 /= cs
+					c1 /= cs
+					r := px0.R*c0 + px1.R*c1
+					g := px0.G*c0 + px1.G*c1
+					b := px0.B*c0 + px1.B*c1
+					a := px0.A + px1.A*(1-px0.A)
+					pixSetterDst.setPixel(x, y, pixel{r, g, b, a})
+				}
+			}
+		})
+
+	default:
+		if pt.Eq(dst.Bounds().Min) {
+			g.Draw(dst, src)
+			return
+		}
+		if subimg, ok := getSubImage(dst, pt); ok {
+			g.Draw(subimg, src)
+			return
+		}
+		tb := g.Bounds(src.Bounds())
+		tb = tb.Sub(tb.Min).Add(pt)
+		tmp := createTempImage(tb)
+		g.Draw(tmp, src)
+		pixGetter := newPixelGetter(tmp)
+		pixSetter := newPixelSetter(dst)
+		ib := tb.Intersect(dst.Bounds())
+		parallelize(g.Options.Parallelization, ib.Min.Y, ib.Max.Y, func(pmin, pmax int) {
+			for y := pmin; y < pmax; y++ {
+				for x := ib.Min.X; x < ib.Max.X; x++ {
+					pixSetter.setPixel(x, y, pixGetter.getPixel(x, y))
+				}
+			}
+		})
+	}
+}
+
+func getSubImage(img draw.Image, pt image.Point) (draw.Image, bool) {
+	if !pt.In(img.Bounds()) {
+		return nil, false
+	}
+	switch img := img.(type) {
+	case *image.Gray:
+		return img.SubImage(image.Rectangle{pt, img.Bounds().Max}).(draw.Image), true
+	case *image.Gray16:
+		return img.SubImage(image.Rectangle{pt, img.Bounds().Max}).(draw.Image), true
+	case *image.RGBA:
+		return img.SubImage(image.Rectangle{pt, img.Bounds().Max}).(draw.Image), true
+	case *image.RGBA64:
+		return img.SubImage(image.Rectangle{pt, img.Bounds().Max}).(draw.Image), true
+	case *image.NRGBA:
+		return img.SubImage(image.Rectangle{pt, img.Bounds().Max}).(draw.Image), true
+	case *image.NRGBA64:
+		return img.SubImage(image.Rectangle{pt, img.Bounds().Max}).(draw.Image), true
+	default:
+		return nil, false
+	}
+}
