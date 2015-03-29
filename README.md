@@ -167,7 +167,7 @@ Original image | Filtered image
 --- | ---
 ![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_crop.jpg)
 
-##### Crop to size 200x200px, anchor: center
+##### Crop to size 160x160px, anchor: center
 ```go
 gift.CropToSize(160, 160, gift.CenterAnchor)
 ```
