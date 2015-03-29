@@ -34,15 +34,64 @@ dst := image.NewRGBA(g.Bounds(src.Bounds()))
 g.Draw(dst, src)
 ``` 
 
+### USAGE
+
+To create a sequence of filters, the `New` function is used:
+ ```go
+g := gift.New(
+    gift.Grayscale(),
+    gift.Contrast(10),
+)
+ ```
+Filters also can be added using the `Add` method:
+ ```go
+g.Add(GaussianBlur(2)) 
+```
+
+The `Bounds` method takes the bounds of the source image and returns appropriate bounds for the destination image to fit the result (for example, after using `Resize` or `Rotate` filters). 
+
+```go
+dst := image.NewRGBA(g.Bounds(src.Bounds()))
+```
+
+There are two methods available to apply these filters to an image:
+
+- `Draw` applies all the added filters to the src image and outputs the result to the dst image starting from the top-left corner (Min point).
+ ```go
+ g.Draw(dst, src)
+ ```
+
+- `DrawAt` provides more control. It outputs the filtered src image to the dst image at the specified position using the specified image composition operator. This example is equivalent to the previous:
+ ```go
+ g.DrawAt(dst, src, dst.Bounds().Min, gift.CopyOperator)
+ ```
+
+Two image composition operators are supported by now:
+- `CopyOperator` - Replaces pixels of the dst image with pixels of the filtered src image. This mode is used by the Draw method.
+- `OverOperator` - Places the filtered src image on top of the dst image. This mode makes sence if the filtered src image has transparent areas.
+
+Empty filter list can be used to create a copy of an image or to paste one image to another. For example:
+```go
+// Create a new image with dimensions of bgImage
+dstImage := image.NewNRGBA(bgImage.Bounds())
+// Copy the bgImage to the dstImage.
+gift.New().Draw(dstImage, bgImage)
+// Draw the fgImage over the dstImage at the (100, 100) position.
+gift.New().DrawAt(dstImage, fgImage, image.Pt(100, 100), gift.OverOperator)
+```
+
 
 ### SUPPORTED FILTERS
 
 + Transformations
 
     - Crop(rect image.Rectangle)
+    - CropToSize(width, height int, anchor Anchor)
     - FlipHorizontal()
     - FlipVertical()
     - Resize(width, height int, resampling Resampling)
+    - ResizeToFill(width, height int, resampling Resampling, anchor Anchor)
+    - ResizeToFit(width, height int, resampling Resampling)
     - Rotate(angle float32, backgroundColor color.Color, interpolation Interpolation)
     - Rotate180()
     - Rotate270()
@@ -94,6 +143,22 @@ Original image | Filtered image
 --- | ---
 ![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_resize_linear.jpg)
 
+##### Resize to fit 160x160px bounding box
+```go
+gift.ResizeToFit(160, 160, gift.LanczosResampling)
+```
+Original image | Filtered image
+--- | ---
+![original](http://disintegration.github.io/gift/examples/original_h.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_resize_fit.jpg)
+
+##### Resize to fill 160x160px rectangle, anchor: center
+```go
+gift.ResizeToFill(160, 160, gift.LanczosResampling, gift.CenterAnchor)
+```
+Original image | Filtered image
+--- | ---
+![original](http://disintegration.github.io/gift/examples/original_h.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_resize_fill.jpg)
+
 ##### Crop 90, 90 - 250, 250
 ```go
 gift.Crop(image.Rect(90, 90, 250, 250))
@@ -101,6 +166,14 @@ gift.Crop(image.Rect(90, 90, 250, 250))
 Original image | Filtered image
 --- | ---
 ![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_crop.jpg)
+
+##### Crop to size 200x200px, anchor: center
+```go
+gift.CropToSize(160, 160, gift.CenterAnchor)
+```
+Original image | Filtered image
+--- | ---
+![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_crop_to_size.jpg)
 
 ##### Rotate 90 degrees
 ```go
