@@ -139,6 +139,29 @@ func convertPalette(p []color.Color) []pixel {
 	return pnew
 }
 
+func getPaletteIndex(pal []pixel, px pixel) int {
+	var k int = 0
+	var dmin float32 = 4
+	for i, palpx := range pal {
+		d := px.R - palpx.R
+		dcur := d * d
+		d = px.G - palpx.G
+		dcur += d * d
+		d = px.B - palpx.B
+		dcur += d * d
+		d = px.A - palpx.A
+		dcur += d * d
+		if dcur < 0.0001 {
+			return i
+		}
+		if dcur < dmin {
+			dmin = dcur
+			k = i
+		}
+	}
+	return k
+}
+
 func pixelclr(c color.Color) (px pixel) {
 	r16, g16, b16, a16 := c.RGBA()
 	switch a16 {
@@ -281,15 +304,17 @@ func f32u16(val float32) uint16 {
 }
 
 type pixelSetter struct {
-	imgType    imageType
-	imgBounds  image.Rectangle
-	imgGeneric draw.Image
-	imgNRGBA   *image.NRGBA
-	imgNRGBA64 *image.NRGBA64
-	imgRGBA    *image.RGBA
-	imgRGBA64  *image.RGBA64
-	imgGray    *image.Gray
-	imgGray16  *image.Gray16
+	imgType     imageType
+	imgBounds   image.Rectangle
+	imgGeneric  draw.Image
+	imgNRGBA    *image.NRGBA
+	imgNRGBA64  *image.NRGBA64
+	imgRGBA     *image.RGBA
+	imgRGBA64   *image.RGBA64
+	imgGray     *image.Gray
+	imgGray16   *image.Gray16
+	imgPaletted *image.Paletted
+	imgPalette  []pixel
 }
 
 func newPixelSetter(img draw.Image) (p *pixelSetter) {
@@ -334,6 +359,14 @@ func newPixelSetter(img draw.Image) (p *pixelSetter) {
 			imgType:   itGray16,
 			imgBounds: img.Bounds(),
 			imgGray16: img,
+		}
+
+	case *image.Paletted:
+		p = &pixelSetter{
+			imgType:     itPaletted,
+			imgBounds:   img.Bounds(),
+			imgPaletted: img,
+			imgPalette:  convertPalette(img.Palette),
 		}
 
 	default:
@@ -406,6 +439,17 @@ func (p *pixelSetter) setPixel(x, y int, px pixel) {
 		y16 := f32u16((0.299*px.R + 0.587*px.G + 0.114*px.B) * px.A * 65535.0)
 		p.imgGray16.Pix[i+0] = uint8(y16 >> 8)
 		p.imgGray16.Pix[i+1] = uint8(y16 & 0xff)
+
+	case itPaletted:
+		px1 := pixel{
+			minf32(maxf32(px.R, 0), 1),
+			minf32(maxf32(px.G, 0), 1),
+			minf32(maxf32(px.B, 0), 1),
+			minf32(maxf32(px.A, 0), 1),
+		}
+		i := p.imgPaletted.PixOffset(x, y)
+		k := getPaletteIndex(p.imgPalette, px1)
+		p.imgPaletted.Pix[i] = uint8(k)
 
 	case itGeneric:
 		r16 := f32u16(px.R * 65535.0)

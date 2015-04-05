@@ -351,6 +351,11 @@ func TestNewPixelSetter(t *testing.T) {
 	if pg.imgType != itGray16 || pg.imgGray16 == nil || !img.Bounds().Eq(pg.imgBounds) {
 		t.Error("newPixelSetter Gray16")
 	}
+	img = image.NewPaletted(image.Rect(0, 0, 1, 1), color.Palette{})
+	pg = newPixelSetter(img)
+	if pg.imgType != itPaletted || pg.imgPaletted == nil || !img.Bounds().Eq(pg.imgBounds) {
+		t.Error("newPixelSetter Paletted")
+	}
 	img = image.NewAlpha(image.Rect(0, 0, 1, 1))
 	pg = newPixelSetter(img)
 	if pg.imgType != itGeneric || pg.imgGeneric == nil || !img.Bounds().Eq(pg.imgBounds) {
@@ -375,6 +380,7 @@ func TestSetPixel(t *testing.T) {
 		px pixel
 	}{
 		{color.NRGBA{0, 0, 0, 0}, pixel{0, 0, 0, 0}},
+		{color.NRGBA{0, 0, 0, 255}, pixel{0, 0, 0, 1}},
 		{color.NRGBA{255, 255, 255, 255}, pixel{1, 1, 1, 1}},
 		{color.NRGBA{50, 100, 150, 255}, pixel{0.196, 0.392, 0.588, 1}},
 		{color.NRGBA{150, 100, 50, 200}, pixel{0.588, 0.392, 0.196, 0.784}},
@@ -447,6 +453,50 @@ func TestSetPixel(t *testing.T) {
 				c := color.NRGBAModel.Convert(img.At(x, y)).(color.NRGBA)
 				if !compareColorsNRGBA(c, k.c, 1) {
 					t.Errorf("setPixel %T %v %dx%d %v %v", img, k.px, x, y, k.c, c)
+				}
+			}
+		}
+	}
+
+	// Paletted
+
+	images4 := []draw.Image{
+		image.NewPaletted(
+			image.Rect(-1, -2, 3, 4),
+			color.Palette{
+				color.NRGBA{0, 0, 0, 0},
+				color.NRGBA{0, 0, 0, 255},
+				color.NRGBA{255, 255, 255, 255},
+				color.NRGBA{50, 100, 150, 255},
+				color.NRGBA{150, 100, 50, 200},
+			},
+		),
+	}
+
+	colors4 := []struct {
+		c  color.NRGBA
+		px pixel
+	}{
+		{color.NRGBA{0, 0, 0, 0}, pixel{0, 0, 0, 0}},
+		{color.NRGBA{0, 0, 0, 255}, pixel{0, 0, 0, 1}},
+		{color.NRGBA{255, 255, 255, 255}, pixel{1, 1, 1, 1}},
+		{color.NRGBA{50, 100, 150, 255}, pixel{0.196, 0.392, 0.588, 1}},
+		{color.NRGBA{150, 100, 50, 200}, pixel{0.588, 0.392, 0.196, 0.784}},
+		{color.NRGBA{0, 0, 0, 0}, pixel{0.1, 0.01, 0.001, 0.1}},
+		{color.NRGBA{0, 0, 0, 255}, pixel{0, 0, 0, 0.9}},
+		{color.NRGBA{255, 255, 255, 255}, pixel{1, 0.9, 1, 0.9}},
+	}
+
+	for _, img := range images4 {
+		ps = newPixelSetter(img)
+		for _, k := range colors4 {
+			for _, x := range []int{-1, 0, 2} {
+				for _, y := range []int{-2, 0, 3} {
+					ps.setPixel(x, y, k.px)
+					c := color.NRGBAModel.Convert(img.At(x, y)).(color.NRGBA)
+					if !compareColorsNRGBA(c, k.c, 1) {
+						t.Errorf("setPixel %T %v %dx%d %v %v", img, k.px, x, y, k.c, c)
+					}
 				}
 			}
 		}
