@@ -469,6 +469,9 @@ func TestSetPixel(t *testing.T) {
 				color.NRGBA{255, 255, 255, 255},
 				color.NRGBA{50, 100, 150, 255},
 				color.NRGBA{150, 100, 50, 200},
+				color.NRGBA{1, 255, 255, 255},
+				color.NRGBA{2, 255, 255, 255},
+				color.NRGBA{3, 255, 255, 255},
 			},
 		),
 	}
@@ -485,6 +488,11 @@ func TestSetPixel(t *testing.T) {
 		{color.NRGBA{0, 0, 0, 0}, pixel{0.1, 0.01, 0.001, 0.1}},
 		{color.NRGBA{0, 0, 0, 255}, pixel{0, 0, 0, 0.9}},
 		{color.NRGBA{255, 255, 255, 255}, pixel{1, 0.9, 1, 0.9}},
+		{color.NRGBA{1, 255, 255, 255}, pixel{0.001 / 255, 1, 1, 1}},
+		{color.NRGBA{1, 255, 255, 255}, pixel{1.001 / 255, 1, 1, 1}},
+		{color.NRGBA{2, 255, 255, 255}, pixel{2.001 / 255, 1, 1, 1}},
+		{color.NRGBA{3, 255, 255, 255}, pixel{3.001 / 255, 1, 1, 1}},
+		{color.NRGBA{3, 255, 255, 255}, pixel{4.001 / 255, 1, 1, 1}},
 	}
 
 	for _, img := range images4 {
@@ -494,7 +502,7 @@ func TestSetPixel(t *testing.T) {
 				for _, y := range []int{-2, 0, 3} {
 					ps.setPixel(x, y, k.px)
 					c := color.NRGBAModel.Convert(img.At(x, y)).(color.NRGBA)
-					if !compareColorsNRGBA(c, k.c, 1) {
+					if !compareColorsNRGBA(c, k.c, 0) {
 						t.Errorf("setPixel %T %v %dx%d %v %v", img, k.px, x, y, k.c, c)
 					}
 				}

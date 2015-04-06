@@ -112,6 +112,7 @@ func newPixelGetter(img image.Image) (p *pixelGetter) {
 const (
 	qf8  = float32(1.0 / 255.0)
 	qf16 = float32(1.0 / 65535.0)
+	epal = qf16 * qf16 / 2.0
 )
 
 func convertPalette(p []color.Color) []pixel {
@@ -151,7 +152,7 @@ func getPaletteIndex(pal []pixel, px pixel) int {
 		dcur += d * d
 		d = px.A - palpx.A
 		dcur += d * d
-		if dcur < 0.0001 {
+		if dcur < epal {
 			return i
 		}
 		if dcur < dmin {
