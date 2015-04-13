@@ -97,9 +97,8 @@ func ColorspaceSRGBToLinear() Filter {
 		fn: func(x float32) float32 {
 			if x <= 0.04045 {
 				return x / 12.92
-			} else {
-				return float32(math.Pow(float64((x+0.055)/1.055), 2.4))
 			}
+			return float32(math.Pow(float64((x+0.055)/1.055), 2.4))
 		},
 		lut: true,
 	}
@@ -111,9 +110,8 @@ func ColorspaceLinearToSRGB() Filter {
 		fn: func(x float32) float32 {
 			if x <= 0.0031308 {
 				return x * 12.92
-			} else {
-				return float32(1.055*math.Pow(float64(x), 1.0/2.4) - 0.055)
 			}
+			return float32(1.055*math.Pow(float64(x), 1.0/2.4) - 0.055)
 		},
 		lut: true,
 	}
@@ -192,9 +190,8 @@ func Contrast(percentage float32) Filter {
 			} else {
 				if x < 0.5 {
 					return 0.0
-				} else {
-					return 1.0
 				}
+				return 1.0
 			}
 		},
 		lut: false,
@@ -365,7 +362,7 @@ func convertRGBToHSL(r, g, b float32) (float32, float32, float32) {
 func normalizeHue(hue float32) float32 {
 	hue = hue - float32(int(hue))
 	if hue < 0 {
-		hue += 1
+		hue++
 	}
 	return hue
 }

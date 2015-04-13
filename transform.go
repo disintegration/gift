@@ -124,11 +124,15 @@ func Transverse() Filter {
 	}
 }
 
+// Interpolation is an interpolation algorithm used for image transformation.
 type Interpolation int
 
 const (
+	// Nearest Neighbor interpolation algorithm
 	NearestNeighborInterpolation Interpolation = iota
+	// Linear interpolation algorithm
 	LinearInterpolation
+	// Cubic interpolation algorithm
 	CubicInterpolation
 )
 

@@ -38,7 +38,7 @@ func (p *rankFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 
 	ksize := p.ksize
 	if ksize%2 == 0 {
-		ksize -= 1
+		ksize--
 	}
 
 	if ksize <= 1 {

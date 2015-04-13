@@ -239,7 +239,7 @@ func TestGetPixelRow(t *testing.T) {
 
 	img := image.NewNRGBA(image.Rect(-1, -2, 3, 2))
 	pg := newPixelGetter(img)
-	row := make([]pixel, 0)
+	var row []pixel
 	for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
 		for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
 			img.Set(x, y, colors[x-img.Bounds().Min.X])
@@ -267,7 +267,7 @@ func TestGetPixelColumn(t *testing.T) {
 
 	img := image.NewNRGBA(image.Rect(-1, -2, 3, 2))
 	pg := newPixelGetter(img)
-	column := make([]pixel, 0)
+	var column []pixel
 	for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
 		for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
 			img.Set(x, y, colors[y-img.Bounds().Min.Y])

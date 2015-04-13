@@ -9,7 +9,7 @@ import (
 func prepareConvolutionWeights(kernel []float32, normalize bool) (int, []uvweight) {
 	size := int(math.Sqrt(float64(len(kernel))))
 	if size%2 == 0 {
-		size -= 1
+		size--
 	}
 	if size < 1 {
 		return 0, []uvweight{}
@@ -209,7 +209,7 @@ func Convolution(kernel []float32, normalize, alpha, abs bool, delta float32) Fi
 func prepareConvolutionWeights1d(kernel []float32) (int, []uweight) {
 	size := len(kernel)
 	if size%2 == 0 {
-		size -= 1
+		size--
 	}
 	if size < 1 {
 		return 0, []uweight{}
@@ -473,7 +473,7 @@ func (p *meanFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 
 	ksize := p.ksize
 	if ksize%2 == 0 {
-		ksize -= 1
+		ksize--
 	}
 
 	if ksize <= 1 {
@@ -487,7 +487,7 @@ func (p *meanFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 		f.Draw(dst, src, options)
 	} else {
 		kernel := make([]float32, ksize)
-		for i, _ := range kernel {
+		for i := range kernel {
 			kernel[i] = 1.0 / float32(ksize)
 		}
 		tmp := createTempImage(src.Bounds())

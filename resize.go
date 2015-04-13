@@ -6,6 +6,7 @@ import (
 	"math"
 )
 
+// Resampling is an interpolation algorithm used for image resizing.
 type Resampling interface {
 	Support() float32
 	Kernel(float32) float32
@@ -31,21 +32,21 @@ func sinc(x float32) float32 {
 	return float32(math.Sin(math.Pi*float64(x)) / (math.Pi * float64(x)))
 }
 
-type resamplingStruct struct {
+type resamp struct {
 	name    string
 	support float32
 	kernel  func(float32) float32
 }
 
-func (r resamplingStruct) String() string {
+func (r resamp) String() string {
 	return r.name
 }
 
-func (r resamplingStruct) Support() float32 {
+func (r resamp) Support() float32 {
 	return r.support
 }
 
-func (r resamplingStruct) Kernel(x float32) float32 {
+func (r resamp) Kernel(x float32) float32 {
 	return r.kernel(x)
 }
 
@@ -375,7 +376,7 @@ func ResizeToFill(width, height int, resampling Resampling, anchor Anchor) Filte
 
 func init() {
 	// Nearest neighbor resampling filter.
-	NearestNeighborResampling = resamplingStruct{
+	NearestNeighborResampling = resamp{
 		name:    "NearestNeighborResampling",
 		support: 0.0,
 		kernel: func(x float32) float32 {
@@ -384,7 +385,7 @@ func init() {
 	}
 
 	// Box resampling filter.
-	BoxResampling = resamplingStruct{
+	BoxResampling = resamp{
 		name:    "BoxResampling",
 		support: 0.5,
 		kernel: func(x float32) float32 {
@@ -399,7 +400,7 @@ func init() {
 	}
 
 	// Linear resampling filter.
-	LinearResampling = resamplingStruct{
+	LinearResampling = resamp{
 		name:    "LinearResampling",
 		support: 1.0,
 		kernel: func(x float32) float32 {
@@ -414,7 +415,7 @@ func init() {
 	}
 
 	// Cubic resampling filter (Catmull-Rom).
-	CubicResampling = resamplingStruct{
+	CubicResampling = resamp{
 		name:    "CubicResampling",
 		support: 2.0,
 		kernel: func(x float32) float32 {
@@ -429,7 +430,7 @@ func init() {
 	}
 
 	// Lanczos resampling filter (3 lobes).
-	LanczosResampling = resamplingStruct{
+	LanczosResampling = resamp{
 		name:    "LanczosResampling",
 		support: 3.0,
 		kernel: func(x float32) float32 {

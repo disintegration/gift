@@ -24,8 +24,8 @@ func TestRotate90(t *testing.T) {
 		1, 2, 3, 4,
 		5, 6, 7, 8,
 	}
-	img1_exp := image.NewGray(image.Rect(0, 0, 2, 4))
-	img1_exp.Pix = []uint8{
+	img1Exp := image.NewGray(image.Rect(0, 0, 2, 4))
+	img1Exp.Pix = []uint8{
 		4, 8,
 		3, 7,
 		2, 6,
@@ -36,11 +36,11 @@ func TestRotate90(t *testing.T) {
 	img1 := image.NewGray(f.Bounds(img0.Bounds()))
 	f.Draw(img1, img0, nil)
 
-	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
-		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
+	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
+		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1_exp.Pix, img1.Pix) {
-		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
+	if !comparePix(img1Exp.Pix, img1.Pix) {
+		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
 
@@ -50,8 +50,8 @@ func TestRotate180(t *testing.T) {
 		1, 2, 3, 4,
 		5, 6, 7, 8,
 	}
-	img1_exp := image.NewGray(image.Rect(0, 0, 4, 2))
-	img1_exp.Pix = []uint8{
+	img1Exp := image.NewGray(image.Rect(0, 0, 4, 2))
+	img1Exp.Pix = []uint8{
 		8, 7, 6, 5,
 		4, 3, 2, 1,
 	}
@@ -60,11 +60,11 @@ func TestRotate180(t *testing.T) {
 	img1 := image.NewGray(f.Bounds(img0.Bounds()))
 	f.Draw(img1, img0, nil)
 
-	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
-		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
+	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
+		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1_exp.Pix, img1.Pix) {
-		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
+	if !comparePix(img1Exp.Pix, img1.Pix) {
+		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
 
@@ -74,8 +74,8 @@ func TestRotate270(t *testing.T) {
 		1, 2, 3, 4,
 		5, 6, 7, 8,
 	}
-	img1_exp := image.NewGray(image.Rect(0, 0, 2, 4))
-	img1_exp.Pix = []uint8{
+	img1Exp := image.NewGray(image.Rect(0, 0, 2, 4))
+	img1Exp.Pix = []uint8{
 		5, 1,
 		6, 2,
 		7, 3,
@@ -86,11 +86,11 @@ func TestRotate270(t *testing.T) {
 	img1 := image.NewGray(f.Bounds(img0.Bounds()))
 	f.Draw(img1, img0, nil)
 
-	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
-		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
+	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
+		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1_exp.Pix, img1.Pix) {
-		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
+	if !comparePix(img1Exp.Pix, img1.Pix) {
+		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
 
@@ -100,8 +100,8 @@ func TestFlipHorizontal(t *testing.T) {
 		1, 2, 3, 4,
 		5, 6, 7, 8,
 	}
-	img1_exp := image.NewGray(image.Rect(0, 0, 4, 2))
-	img1_exp.Pix = []uint8{
+	img1Exp := image.NewGray(image.Rect(0, 0, 4, 2))
+	img1Exp.Pix = []uint8{
 		4, 3, 2, 1,
 		8, 7, 6, 5,
 	}
@@ -110,11 +110,11 @@ func TestFlipHorizontal(t *testing.T) {
 	img1 := image.NewGray(f.Bounds(img0.Bounds()))
 	f.Draw(img1, img0, nil)
 
-	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
-		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
+	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
+		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1_exp.Pix, img1.Pix) {
-		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
+	if !comparePix(img1Exp.Pix, img1.Pix) {
+		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
 
@@ -124,8 +124,8 @@ func TestFlipVertical(t *testing.T) {
 		1, 2, 3, 4,
 		5, 6, 7, 8,
 	}
-	img1_exp := image.NewGray(image.Rect(0, 0, 4, 2))
-	img1_exp.Pix = []uint8{
+	img1Exp := image.NewGray(image.Rect(0, 0, 4, 2))
+	img1Exp.Pix = []uint8{
 		5, 6, 7, 8,
 		1, 2, 3, 4,
 	}
@@ -134,11 +134,11 @@ func TestFlipVertical(t *testing.T) {
 	img1 := image.NewGray(f.Bounds(img0.Bounds()))
 	f.Draw(img1, img0, nil)
 
-	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
-		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
+	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
+		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1_exp.Pix, img1.Pix) {
-		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
+	if !comparePix(img1Exp.Pix, img1.Pix) {
+		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
 
@@ -148,8 +148,8 @@ func TestTranspose(t *testing.T) {
 		1, 2, 3, 4,
 		5, 6, 7, 8,
 	}
-	img1_exp := image.NewGray(image.Rect(0, 0, 2, 4))
-	img1_exp.Pix = []uint8{
+	img1Exp := image.NewGray(image.Rect(0, 0, 2, 4))
+	img1Exp.Pix = []uint8{
 		1, 5,
 		2, 6,
 		3, 7,
@@ -160,11 +160,11 @@ func TestTranspose(t *testing.T) {
 	img1 := image.NewGray(f.Bounds(img0.Bounds()))
 	f.Draw(img1, img0, nil)
 
-	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
-		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
+	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
+		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1_exp.Pix, img1.Pix) {
-		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
+	if !comparePix(img1Exp.Pix, img1.Pix) {
+		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
 
@@ -174,8 +174,8 @@ func TestTransverse(t *testing.T) {
 		1, 2, 3, 4,
 		5, 6, 7, 8,
 	}
-	img1_exp := image.NewGray(image.Rect(0, 0, 2, 4))
-	img1_exp.Pix = []uint8{
+	img1Exp := image.NewGray(image.Rect(0, 0, 2, 4))
+	img1Exp.Pix = []uint8{
 		8, 4,
 		7, 3,
 		6, 2,
@@ -186,11 +186,11 @@ func TestTransverse(t *testing.T) {
 	img1 := image.NewGray(f.Bounds(img0.Bounds()))
 	f.Draw(img1, img0, nil)
 
-	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
-		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
+	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
+		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1_exp.Pix, img1.Pix) {
-		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
+	if !comparePix(img1Exp.Pix, img1.Pix) {
+		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
 

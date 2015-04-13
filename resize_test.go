@@ -53,19 +53,19 @@ func TestResize(t *testing.T) {
 		1, 2, 3, 4, 5,
 		6, 7, 8, 0, 1,
 	}
-	img1_exp := image.NewGray(image.Rect(0, 0, 2, 2))
-	img1_exp.Pix = []uint8{
+	img1Exp := image.NewGray(image.Rect(0, 0, 2, 2))
+	img1Exp.Pix = []uint8{
 		2, 4,
 		7, 0,
 	}
 	f := Resize(2, 2, NearestNeighborResampling)
 	img1 = image.NewGray(f.Bounds(img0.Bounds()))
 	f.Draw(img1, img0, nil)
-	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
-		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
+	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
+		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1_exp.Pix, img1.Pix) {
-		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
+	if !comparePix(img1Exp.Pix, img1.Pix) {
+		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 
 	// Box Filter resize
@@ -74,18 +74,18 @@ func TestResize(t *testing.T) {
 		1, 2, 2, 1,
 		4, 5, 8, 9,
 	}
-	img1_exp = image.NewGray(image.Rect(0, 0, 2, 1))
-	img1_exp.Pix = []uint8{
+	img1Exp = image.NewGray(image.Rect(0, 0, 2, 1))
+	img1Exp.Pix = []uint8{
 		3, 5,
 	}
 	f = Resize(2, 1, BoxResampling)
 	img1 = image.NewGray(f.Bounds(img0.Bounds()))
 	f.Draw(img1, img0, nil)
-	if img1.Bounds().Size() != img1_exp.Bounds().Size() {
-		t.Errorf("expected %v got %v", img1_exp.Bounds().Size(), img1.Bounds().Size())
+	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
+		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1_exp.Pix, img1.Pix) {
-		t.Errorf("expected %v got %v", img1_exp.Pix, img1.Pix)
+	if !comparePix(img1Exp.Pix, img1.Pix) {
+		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 
 	// Empty image should remain empty and not panic
@@ -112,7 +112,7 @@ func TestResize(t *testing.T) {
 		t.Errorf("bcspline(2.0, ...) != 0")
 	}
 
-	if (resamplingStruct{name: "test"}).String() != "test" {
+	if (resamp{name: "test"}).String() != "test" {
 		t.Error("resamplingStruct String() fail")
 	}
 }

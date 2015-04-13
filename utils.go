@@ -182,7 +182,7 @@ func isOpaque(img image.Image) bool {
 // generate disk-shaped kernel
 func genDisk(ksize int) []float32 {
 	if ksize%2 == 0 {
-		ksize -= 1
+		ksize--
 	}
 	if ksize < 1 {
 		return []float32{}

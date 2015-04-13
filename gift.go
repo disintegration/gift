@@ -28,6 +28,7 @@ import (
 	"image/draw"
 )
 
+// Filter is an image processing filter.
 type Filter interface {
 	// Draw applies the filter to the src image and outputs the result to the dst image.
 	Draw(dst draw.Image, src image.Image, options *Options)
@@ -35,6 +36,7 @@ type Filter interface {
 	Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangle)
 }
 
+// Options is the parameters passed to image processing filters.
 type Options struct {
 	Parallelization bool
 }
