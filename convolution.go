@@ -244,10 +244,16 @@ func convolveLine(dstBuf []pixel, srcBuf []pixel, weights []uweight) {
 				k = max
 			}
 			c := srcBuf[k]
-			r += c.R * w.weight
-			g += c.G * w.weight
-			b += c.B * w.weight
-			a += c.A * w.weight
+			wa := c.A * w.weight
+			r += c.R * wa
+			g += c.G * wa
+			b += c.B * wa
+			a += wa
+		}
+		if a != 0 && a != 1.0 {
+			r /= a
+			g /= a
+			b /= a
 		}
 		dstBuf[dstu] = pixel{r, g, b, a}
 	}
@@ -486,13 +492,12 @@ func (p *meanFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 		f := Convolution(diskKernel, true, true, false, 0.0)
 		f.Draw(dst, src, options)
 	} else {
-		kernel := make([]float32, ksize)
+		kernel := make([]float32, ksize*ksize)
 		for i := range kernel {
-			kernel[i] = 1.0 / float32(ksize)
+			kernel[i] = 1.0
 		}
-		tmp := createTempImage(src.Bounds())
-		convolve1dh(tmp, src, kernel, options)
-		convolve1dv(dst, tmp, kernel, options)
+		f := Convolution(kernel, true, true, false, 0.0)
+		f.Draw(dst, src, options)
 	}
 }
 

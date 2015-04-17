@@ -260,10 +260,17 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 					cfs[15] = (1.0 / 36.0) * xq * yq * (xq - 1) * (xq + 1) * (yq - 1) * (yq + 1)
 
 					for i := range pxs {
-						px.R += pxs[i].R * cfs[i]
-						px.G += pxs[i].G * cfs[i]
-						px.B += pxs[i].B * cfs[i]
-						px.A += pxs[i].A * cfs[i]
+						wa := pxs[i].A * cfs[i]
+						px.R += pxs[i].R * wa
+						px.G += pxs[i].G * wa
+						px.B += pxs[i].B * wa
+						px.A += wa
+					}
+
+					if px.A != 0.0 && px.A != 1.0 {
+						px.R /= px.A
+						px.G /= px.A
+						px.B /= px.A
 					}
 
 					pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, px)
@@ -300,10 +307,17 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 					cfs[3] = xq * yq
 
 					for i := range pxs {
-						px.R += pxs[i].R * cfs[i]
-						px.G += pxs[i].G * cfs[i]
-						px.B += pxs[i].B * cfs[i]
-						px.A += pxs[i].A * cfs[i]
+						wa := pxs[i].A * cfs[i]
+						px.R += pxs[i].R * wa
+						px.G += pxs[i].G * wa
+						px.B += pxs[i].B * wa
+						px.A += wa
+					}
+
+					if px.A != 0.0 && px.A != 1.0 {
+						px.R /= px.A
+						px.G /= px.A
+						px.B /= px.A
 					}
 
 					pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, px)

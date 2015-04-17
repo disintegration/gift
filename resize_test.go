@@ -115,6 +115,69 @@ func TestResize(t *testing.T) {
 	if (resamp{name: "test"}).String() != "test" {
 		t.Error("resamplingStruct String() fail")
 	}
+
+	testData := []struct {
+		desc           string
+		w, h           int
+		r              Resampling
+		srcb, dstb     image.Rectangle
+		srcPix, dstPix []uint8
+	}{
+		{
+			"resize (1, 2 -> 1, 1; box; non-alpha)",
+			1, 1, BoxResampling,
+			image.Rect(0, 0, 1, 2),
+			image.Rect(0, 0, 1, 1),
+			[]uint8{
+				0xff, 0x00, 0x00, 0xff,
+				0x00, 0xff, 0x00, 0xff,
+			},
+			[]uint8{
+				0x80, 0x80, 0x00, 0xff,
+			},
+		},
+		{
+			"resize (1, 2 -> 1, 1; box; alpha)",
+			1, 1, BoxResampling,
+			image.Rect(0, 0, 1, 2),
+			image.Rect(0, 0, 1, 1),
+			[]uint8{
+				0xff, 0x00, 0x00, 0xff,
+				0x00, 0xff, 0x00, 0x00,
+			},
+			[]uint8{
+				0xff, 0x00, 0x00, 0x80,
+			},
+		},
+		{
+			"resize (1, 2 -> 1, 3; linear; alpha)",
+			1, 3, LinearResampling,
+			image.Rect(0, 0, 1, 2),
+			image.Rect(0, 0, 1, 3),
+			[]uint8{
+				0xff, 0x00, 0x00, 0xff,
+				0x00, 0xff, 0x00, 0x00,
+			},
+			[]uint8{
+				0xff, 0x00, 0x00, 0xff,
+				0xff, 0x00, 0x00, 0x80,
+				0x00, 0x00, 0x00, 0x00,
+			},
+		},
+	}
+
+	for _, d := range testData {
+		src := image.NewNRGBA(d.srcb)
+		src.Pix = d.srcPix
+
+		f := Resize(d.w, d.h, d.r)
+		dst := image.NewNRGBA(f.Bounds(src.Bounds()))
+		f.Draw(dst, src, nil)
+
+		if !checkBoundsAndPix(dst.Bounds(), d.dstb, dst.Pix, d.dstPix) {
+			t.Errorf("test [%s] failed: %#v, %#v", d.desc, dst.Bounds(), dst.Pix)
+		}
+	}
 }
 
 func TestResizeToFit(t *testing.T) {
