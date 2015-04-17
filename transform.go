@@ -267,7 +267,7 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 						px.A += wa
 					}
 
-					if px.A != 0.0 && px.A != 1.0 {
+					if px.A != 0.0 {
 						px.R /= px.A
 						px.G /= px.A
 						px.B /= px.A
@@ -314,7 +314,7 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 						px.A += wa
 					}
 
-					if px.A != 0.0 && px.A != 1.0 {
+					if px.A != 0.0 {
 						px.R /= px.A
 						px.G /= px.A
 						px.B /= px.A

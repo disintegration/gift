@@ -250,7 +250,7 @@ func convolveLine(dstBuf []pixel, srcBuf []pixel, weights []uweight) {
 			b += c.B * wa
 			a += wa
 		}
-		if a != 0 && a != 1.0 {
+		if a != 0 {
 			r /= a
 			g /= a
 			b /= a
