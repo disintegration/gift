@@ -186,15 +186,17 @@ func TestConvolution(t *testing.T) {
 	}
 
 	for _, d := range testData {
-		src := image.NewNRGBA(d.srcb)
-		src.Pix = d.srcPix
+		for _, parallel := range []bool{true, false} {
+			src := image.NewNRGBA(d.srcb)
+			src.Pix = d.srcPix
 
-		f := Convolution(d.kernel, d.normalize, d.alpha, d.abs, d.delta)
-		dst := image.NewNRGBA(f.Bounds(src.Bounds()))
-		f.Draw(dst, src, nil)
+			f := Convolution(d.kernel, d.normalize, d.alpha, d.abs, d.delta)
+			dst := image.NewNRGBA(f.Bounds(src.Bounds()))
+			f.Draw(dst, src, &Options{Parallelization: parallel})
 
-		if !checkBoundsAndPix(dst.Bounds(), d.dstb, dst.Pix, d.dstPix) {
-			t.Errorf("test [%s] failed: %#v, %#v", d.desc, dst.Bounds(), dst.Pix)
+			if !checkBoundsAndPix(dst.Bounds(), d.dstb, dst.Pix, d.dstPix) {
+				t.Errorf("test [%s] failed: %#v, %#v", d.desc, dst.Bounds(), dst.Pix)
+			}
 		}
 	}
 
