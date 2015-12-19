@@ -109,35 +109,34 @@ func maxint(x, y int) int {
 
 // in-place quick sort for []float32
 func qsortf32(data []float32) {
-	var qsortidx func([]float32, int, int)
-	qsortidx = func(data []float32, start, stop int) {
-		i := start
-		j := stop
-		x := data[start+(stop-start)/2]
-		for i <= j {
-			for data[i] < x {
-				i++
-			}
-			for data[j] > x {
-				j--
-			}
-			if i <= j {
-				data[i], data[j] = data[j], data[i]
-				i++
-				j--
-			}
-		}
-		if i < stop {
-			qsortidx(data, i, stop)
-		}
-		if j > start {
-			qsortidx(data, start, j)
-		}
-	}
-	if len(data) == 0 {
+	qsortf32idx(data, 0, len(data)-1)
+}
+func qsortf32idx(data []float32, start, stop int) {
+	if stop-start < 1 {
 		return
 	}
-	qsortidx(data, 0, len(data)-1)
+	i := start
+	j := stop
+	x := data[start+(stop-start)/2]
+	for i <= j {
+		for data[i] < x {
+			i++
+		}
+		for data[j] > x {
+			j--
+		}
+		if i <= j {
+			data[i], data[j] = data[j], data[i]
+			i++
+			j--
+		}
+	}
+	if i < stop {
+		qsortf32idx(data, i, stop)
+	}
+	if j > start {
+		qsortf32idx(data, start, j)
+	}
 }
 
 // useful types for precomputing pixel weights
