@@ -92,6 +92,14 @@ func TestPixelate(t *testing.T) {
 				0x49, 0x49, 0x49, 0x49, 0x49,
 			},
 		},
+		{
+			"pixelate 0x0",
+			3,
+			image.Rect(-1, -1, -1, -1),
+			image.Rect(0, 0, 0, 0),
+			[]uint8{},
+			[]uint8{},
+		},
 	}
 
 	for _, d := range testData {

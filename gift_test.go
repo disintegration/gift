@@ -481,6 +481,7 @@ func TestDraw(t *testing.T) {
 		[]Filter{Minimum(3, true)},
 		[]Filter{Mean(3, true)},
 		[]Filter{Median(3, true)},
+		[]Filter{Pixelate(3)},
 		[]Filter{Saturation(10)},
 		[]Filter{Sepia(10)},
 		[]Filter{Sigmoid(0.5, 5)},

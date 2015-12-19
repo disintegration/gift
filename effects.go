@@ -46,7 +46,7 @@ func (p *pixelateFilter) Draw(dst draw.Image, src image.Image, options *Options)
 				// calculate the block bounds
 				bb := image.Rect(bx*blockSize, by*blockSize, (bx+1)*blockSize, (by+1)*blockSize)
 				bbSrc := bb.Add(srcb.Min).Intersect(srcb)
-				bbDst := bb.Add(dstb.Min).Intersect(dstb)
+				bbDst := bbSrc.Sub(srcb.Min).Add(dstb.Min).Intersect(dstb)
 
 				// calculate average color of the block
 				var r, g, b, a float32
