@@ -118,6 +118,7 @@ gift.New().DrawAt(dstImage, fgImage, image.Pt(100, 100), gift.OverOperator)
     - Mean(ksize int, disk bool)
     - Median(ksize int, disk bool)
     - Minimum(ksize int, disk bool)
+    - Pixelate(size int)
     - Saturation(percentage float32)
     - Sepia(percentage float32)
     - Sigmoid(midpoint, factor float32)
@@ -430,6 +431,14 @@ gift.Maximum(5, true)
 Original image | Filtered image
 --- | ---
 ![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_maximum.jpg)
+
+##### Pixelate, size=5
+```go
+gift.Pixelate(5)
+```
+Original image | Filtered image
+--- | ---
+![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_pixelate.jpg)
 
 ##### Convolution matrix - Emboss
 ```go
