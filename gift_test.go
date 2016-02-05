@@ -499,11 +499,11 @@ func TestDraw(t *testing.T) {
 			for y := dst.Bounds().Min.Y; y < dst.Bounds().Max.Y; y++ {
 				failed := false
 				if x == -100 && y == -100 {
-					if (dst.NRGBAAt(x, y) == color.NRGBA{0, 0, 0, 0}) {
+					if (color.NRGBAModel.Convert(dst.At(x, y)).(color.NRGBA) == color.NRGBA{0, 0, 0, 0}) {
 						failed = true
 					}
 				} else {
-					if (dst.NRGBAAt(x, y) != color.NRGBA{0, 0, 0, 0}) {
+					if (color.NRGBAModel.Convert(dst.At(x, y)).(color.NRGBA) != color.NRGBA{0, 0, 0, 0}) {
 						failed = true
 					}
 				}
