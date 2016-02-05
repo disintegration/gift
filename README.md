@@ -1,5 +1,9 @@
 # GO IMAGE FILTERING TOOLKIT (GIFT)
 
+[![GoDoc](https://godoc.org/github.com/disintegration/gift?status.svg)](https://godoc.org/github.com/disintegration/gift)
+[![Build Status](https://travis-ci.org/disintegration/gift.svg?branch=master)](https://travis-ci.org/disintegration/gift)
+[![Coverage Status](https://coveralls.io/repos/github/disintegration/gift/badge.svg?branch=master)](https://coveralls.io/github/disintegration/gift?branch=master)
+
 *Package gift provides a set of useful image processing filters.*
 
 Pure Go. No external dependencies outside of the Go standard library.
@@ -20,7 +24,7 @@ http://godoc.org/github.com/disintegration/gift
 ### QUICK START
 
 ```go
-// 1. Create a new GIFT and add some filters:
+// 1. Create a new GIFT filter list and add some filters:
 g := gift.New(
     gift.Resize(800, 0, gift.LanczosResampling),
     gift.UnsharpMask(1.0, 1.0, 0.0),
