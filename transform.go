@@ -214,129 +214,137 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 
 				xf, yf := rotatePoint(float32(x)-dstxoff, float32(y)-dstyoff, asin, acos)
 				xf, yf = float32(srcb.Min.X)+xf+srcxoff, float32(srcb.Min.Y)+yf+srcyoff
+				var px pixel
 
 				switch p.interpolation {
 				case CubicInterpolation:
-					var calc bool
-					var pxs [16]pixel
-					var cfs [16]float32
-					var px pixel
-
-					x0, y0 := int(floorf32(xf)), int(floorf32(yf))
-					xq, yq := xf-float32(x0), yf-float32(y0)
-
-					for i := 0; i < 4; i++ {
-						for j := 0; j < 4; j++ {
-							pt := image.Pt(x0+j-1, y0+i-1)
-							if pt.In(srcb) {
-								pxs[i*4+j] = pixGetter.getPixel(pt.X, pt.Y)
-								calc = true
-							} else {
-								pxs[i*4+j] = bgpx
-							}
-						}
-					}
-
-					if !calc {
-						pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, bgpx)
-						continue
-					}
-
-					cfs[0] = (1.0 / 36.0) * xq * yq * (xq - 1) * (xq - 2) * (yq - 1) * (yq - 2)
-					cfs[1] = -(1.0 / 12.0) * yq * (xq - 1) * (xq - 2) * (xq + 1) * (yq - 1) * (yq - 2)
-					cfs[2] = (1.0 / 12.0) * xq * yq * (xq + 1) * (xq - 2) * (yq - 1) * (yq - 2)
-					cfs[3] = -(1.0 / 36.0) * xq * yq * (xq - 1) * (xq + 1) * (yq - 1) * (yq - 2)
-					cfs[4] = -(1.0 / 12.0) * xq * (xq - 1) * (xq - 2) * (yq - 1) * (yq - 2) * (yq + 1)
-					cfs[5] = 0.25 * (xq - 1) * (xq - 2) * (xq + 1) * (yq - 1) * (yq - 2) * (yq + 1)
-					cfs[6] = -0.25 * xq * (xq + 1) * (xq - 2) * (yq - 1) * (yq - 2) * (yq + 1)
-					cfs[7] = (1.0 / 12.0) * xq * (xq - 1) * (xq + 1) * (yq - 1) * (yq - 2) * (yq + 1)
-					cfs[8] = (1.0 / 12.0) * xq * yq * (xq - 1) * (xq - 2) * (yq + 1) * (yq - 2)
-					cfs[9] = -0.25 * yq * (xq - 1) * (xq - 2) * (xq + 1) * (yq + 1) * (yq - 2)
-					cfs[10] = 0.25 * xq * yq * (xq + 1) * (xq - 2) * (yq + 1) * (yq - 2)
-					cfs[11] = -(1.0 / 12.0) * xq * yq * (xq - 1) * (xq + 1) * (yq + 1) * (yq - 2)
-					cfs[12] = -(1.0 / 36.0) * xq * yq * (xq - 1) * (xq - 2) * (yq - 1) * (yq + 1)
-					cfs[13] = (1.0 / 12.0) * yq * (xq - 1) * (xq - 2) * (xq + 1) * (yq - 1) * (yq + 1)
-					cfs[14] = -(1.0 / 12.0) * xq * yq * (xq + 1) * (xq - 2) * (yq - 1) * (yq + 1)
-					cfs[15] = (1.0 / 36.0) * xq * yq * (xq - 1) * (xq + 1) * (yq - 1) * (yq + 1)
-
-					for i := range pxs {
-						wa := pxs[i].A * cfs[i]
-						px.R += pxs[i].R * wa
-						px.G += pxs[i].G * wa
-						px.B += pxs[i].B * wa
-						px.A += wa
-					}
-
-					if px.A != 0.0 {
-						px.R /= px.A
-						px.G /= px.A
-						px.B /= px.A
-					}
-
-					pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, px)
-
+					px = interpolateCubic(xf, yf, srcb, pixGetter, bgpx)
 				case LinearInterpolation:
-					var calc bool
-					var pxs [4]pixel
-					var cfs [4]float32
-					var px pixel
-
-					x0, y0 := int(floorf32(xf)), int(floorf32(yf))
-					xq, yq := xf-float32(x0), yf-float32(y0)
-
-					for i := 0; i < 2; i++ {
-						for j := 0; j < 2; j++ {
-							pt := image.Pt(x0+j, y0+i)
-							if pt.In(srcb) {
-								pxs[i*2+j] = pixGetter.getPixel(pt.X, pt.Y)
-								calc = true
-							} else {
-								pxs[i*2+j] = bgpx
-							}
-						}
-					}
-
-					if !calc {
-						pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, bgpx)
-						continue
-					}
-
-					cfs[0] = (1 - xq) * (1 - yq)
-					cfs[1] = xq * (1 - yq)
-					cfs[2] = (1 - xq) * yq
-					cfs[3] = xq * yq
-
-					for i := range pxs {
-						wa := pxs[i].A * cfs[i]
-						px.R += pxs[i].R * wa
-						px.G += pxs[i].G * wa
-						px.B += pxs[i].B * wa
-						px.A += wa
-					}
-
-					if px.A != 0.0 {
-						px.R /= px.A
-						px.G /= px.A
-						px.B /= px.A
-					}
-
-					pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, px)
-
+					px = interpolateLinear(xf, yf, srcb, pixGetter, bgpx)
 				default:
-					var px pixel
-					x0, y0 := int(floorf32(xf+0.5)), int(floorf32(yf+0.5))
-					if image.Pt(x0, y0).In(srcb) {
-						px = pixGetter.getPixel(x0, y0)
-					} else {
-						px = bgpx
-					}
-					pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, px)
+					px = interpolateNearest(xf, yf, srcb, pixGetter, bgpx)
 				}
+
+				pixSetter.setPixel(dstb.Min.X+x, dstb.Min.Y+y, px)
 			}
 		}
 	})
 
 	return
+}
+
+func interpolateCubic(xf, yf float32, bounds image.Rectangle, pixGetter *pixelGetter, bgpx pixel) pixel {
+	var pxs [16]pixel
+	var cfs [16]float32
+	var px pixel
+
+	x0, y0 := int(floorf32(xf)), int(floorf32(yf))
+	if !image.Pt(x0, y0).In(image.Rect(bounds.Min.X-1, bounds.Min.Y-1, bounds.Max.X, bounds.Max.Y)) {
+		return bgpx
+	}
+	xq, yq := xf-float32(x0), yf-float32(y0)
+
+	for i := 0; i < 4; i++ {
+		for j := 0; j < 4; j++ {
+			pt := image.Pt(x0+j-1, y0+i-1)
+			if pt.In(bounds) {
+				pxs[i*4+j] = pixGetter.getPixel(pt.X, pt.Y)
+			} else {
+				pxs[i*4+j] = bgpx
+			}
+		}
+	}
+
+	const (
+		k04 = 1.0 / 4.0
+		k12 = 1.0 / 12.0
+		k36 = 1.0 / 36.0
+	)
+
+	cfs[0] = k36 * xq * yq * (xq - 1) * (xq - 2) * (yq - 1) * (yq - 2)
+	cfs[1] = -k12 * yq * (xq - 1) * (xq - 2) * (xq + 1) * (yq - 1) * (yq - 2)
+	cfs[2] = k12 * xq * yq * (xq + 1) * (xq - 2) * (yq - 1) * (yq - 2)
+	cfs[3] = -k36 * xq * yq * (xq - 1) * (xq + 1) * (yq - 1) * (yq - 2)
+	cfs[4] = -k12 * xq * (xq - 1) * (xq - 2) * (yq - 1) * (yq - 2) * (yq + 1)
+	cfs[5] = k04 * (xq - 1) * (xq - 2) * (xq + 1) * (yq - 1) * (yq - 2) * (yq + 1)
+	cfs[6] = -k04 * xq * (xq + 1) * (xq - 2) * (yq - 1) * (yq - 2) * (yq + 1)
+	cfs[7] = k12 * xq * (xq - 1) * (xq + 1) * (yq - 1) * (yq - 2) * (yq + 1)
+	cfs[8] = k12 * xq * yq * (xq - 1) * (xq - 2) * (yq + 1) * (yq - 2)
+	cfs[9] = -k04 * yq * (xq - 1) * (xq - 2) * (xq + 1) * (yq + 1) * (yq - 2)
+	cfs[10] = k04 * xq * yq * (xq + 1) * (xq - 2) * (yq + 1) * (yq - 2)
+	cfs[11] = -k12 * xq * yq * (xq - 1) * (xq + 1) * (yq + 1) * (yq - 2)
+	cfs[12] = -k36 * xq * yq * (xq - 1) * (xq - 2) * (yq - 1) * (yq + 1)
+	cfs[13] = k12 * yq * (xq - 1) * (xq - 2) * (xq + 1) * (yq - 1) * (yq + 1)
+	cfs[14] = -k12 * xq * yq * (xq + 1) * (xq - 2) * (yq - 1) * (yq + 1)
+	cfs[15] = k36 * xq * yq * (xq - 1) * (xq + 1) * (yq - 1) * (yq + 1)
+
+	for i := range pxs {
+		wa := pxs[i].A * cfs[i]
+		px.R += pxs[i].R * wa
+		px.G += pxs[i].G * wa
+		px.B += pxs[i].B * wa
+		px.A += wa
+	}
+
+	if px.A != 0.0 {
+		px.R /= px.A
+		px.G /= px.A
+		px.B /= px.A
+	}
+
+	return px
+}
+
+func interpolateLinear(xf, yf float32, bounds image.Rectangle, pixGetter *pixelGetter, bgpx pixel) pixel {
+	var pxs [4]pixel
+	var cfs [4]float32
+	var px pixel
+
+	x0, y0 := int(floorf32(xf)), int(floorf32(yf))
+	if !image.Pt(x0, y0).In(image.Rect(bounds.Min.X-1, bounds.Min.Y-1, bounds.Max.X, bounds.Max.Y)) {
+		return bgpx
+	}
+	xq, yq := xf-float32(x0), yf-float32(y0)
+
+	for i := 0; i < 2; i++ {
+		for j := 0; j < 2; j++ {
+			pt := image.Pt(x0+j, y0+i)
+			if pt.In(bounds) {
+				pxs[i*2+j] = pixGetter.getPixel(pt.X, pt.Y)
+			} else {
+				pxs[i*2+j] = bgpx
+			}
+		}
+	}
+
+	cfs[0] = (1 - xq) * (1 - yq)
+	cfs[1] = xq * (1 - yq)
+	cfs[2] = (1 - xq) * yq
+	cfs[3] = xq * yq
+
+	for i := range pxs {
+		wa := pxs[i].A * cfs[i]
+		px.R += pxs[i].R * wa
+		px.G += pxs[i].G * wa
+		px.B += pxs[i].B * wa
+		px.A += wa
+	}
+
+	if px.A != 0.0 {
+		px.R /= px.A
+		px.G /= px.A
+		px.B /= px.A
+	}
+
+	return px
+}
+
+func interpolateNearest(xf, yf float32, bounds image.Rectangle, pixGetter *pixelGetter, bgpx pixel) pixel {
+	x0, y0 := int(floorf32(xf+0.5)), int(floorf32(yf+0.5))
+	if image.Pt(x0, y0).In(bounds) {
+		return pixGetter.getPixel(x0, y0)
+	}
+	return bgpx
 }
 
 // Rotate creates a filter that rotates an image by the given angle counter-clockwise.
