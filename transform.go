@@ -4,6 +4,7 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
+	"math"
 )
 
 type transformType int
@@ -142,6 +143,61 @@ func rotatePoint(x, y, asin, acos float32) (float32, float32) {
 	return newx, newy
 }
 
+// returns the distance between top left corner of original
+// image and top left corner of rotated image as xDiff, yDiff
+func RotateOffSet(w, h int, angle float32) (float32, float32) {
+
+	if w <= 0 || h <= 0 {
+		return 0, 0
+	}
+
+	// find center of src rect for rotation point x0,y0
+	xoff := float32(w)/2 - 0.5
+	yoff := float32(h)/2 - 0.5
+
+	// find pre-rotation point of src top left corner
+	origx := 0 - xoff
+	origy := float32(h-1) - yoff
+
+	// find post-rotation point
+	asin, acos := sincosf32(angle)
+	newx, newy := rotatePoint(origx, origy, asin, acos)
+
+	// find top left corner of dst rect
+	x1, y1 := rotatePoint(0-xoff, 0-yoff, asin, acos)
+	x2, y2 := rotatePoint(float32(w-1)-xoff, 0-yoff, asin, acos)
+	x3, y3 := rotatePoint(float32(w-1)-xoff, float32(h-1)-yoff, asin, acos)
+	x4, y4 := rotatePoint(0-xoff, float32(h-1)-yoff, asin, acos)
+
+	minx := minf32(x1, minf32(x2, minf32(x3, x4)))
+	maxy := maxf32(y1, maxf32(y2, maxf32(y3, y4)))
+
+	xoffset := float32(0)
+	yoffset := float32(0)
+
+	// calculate distance between (newx,newy) and (minx,miny)
+	if angle >= 360 {
+		angle = angle - 360
+	}
+	switch {
+	case 0 <= angle && angle < 90:
+		xoffset = newx - minx
+		yoffset = maxy - newy
+	case 90 <= angle && angle < 180:
+		xoffset = float32(math.Abs(float64(newx - minx)))
+		yoffset = maxy - newy
+	case 180 <= angle && angle < 270:
+		xoffset = newx - minx
+		yoffset = float32(math.Abs(float64(newy - maxy)))
+	case 270 <= angle && angle < 360:
+		xoffset = newx - minx
+		yoffset = newy - maxy
+	}
+
+	return float32(xoffset), float32(yoffset)
+
+}
+
 func calcRotatedSize(w, h int, angle float32) (int, int) {
 	if w <= 0 || h <= 0 {
 		return 0, 0
@@ -151,6 +207,7 @@ func calcRotatedSize(w, h int, angle float32) (int, int) {
 	yoff := float32(h)/2 - 0.5
 
 	asin, acos := sincosf32(angle)
+
 	x1, y1 := rotatePoint(0-xoff, 0-yoff, asin, acos)
 	x2, y2 := rotatePoint(float32(w-1)-xoff, 0-yoff, asin, acos)
 	x3, y3 := rotatePoint(float32(w-1)-xoff, float32(h-1)-yoff, asin, acos)
@@ -197,6 +254,7 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 		return
 	}
 
+	// find middle of src and dst rects
 	srcxoff := float32(srcb.Dx())/2 - 0.5
 	srcyoff := float32(srcb.Dy())/2 - 0.5
 	dstxoff := float32(w)/2 - 0.5
