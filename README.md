@@ -215,13 +215,13 @@ func main() {
 				-1, 1, 1,
 				0, 1, 1,
 			},
-			false, false, false, 0,
+			false, false, false, 0.0,
 		),
 	}
 
 	for name, filter := range filters {
 		g := gift.New(filter)
-		dst := image.NewRGBA(g.Bounds(src.Bounds()))
+		dst := image.NewNRGBA(g.Bounds(src.Bounds()))
 		g.Draw(dst, src)
 		saveImage("testdata/dst_"+name+".png", dst)
 	}
