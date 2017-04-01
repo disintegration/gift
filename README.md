@@ -132,353 +132,121 @@ gift.New().DrawAt(dstImage, fgImage, image.Pt(100, 100), gift.OverOperator)
 
 ### FILTER EXAMPLES
 
-##### Resize using lanczos resampling
-```go
-gift.Resize(200, 0, gift.LanczosResampling)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_resize_lanczos.jpg)
+The original image:
 
-##### Resize using linear resampling
-```go
-gift.Resize(200, 0, gift.LinearResampling)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_resize_linear.jpg)
+![](testdata/src.png) 
 
-##### Resize to fit 160x160px bounding box
-```go
-gift.ResizeToFit(160, 160, gift.LanczosResampling)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original_h.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_resize_fit.jpg)
+Resulting images after applying some of the filters:
 
-##### Resize to fill 160x160px rectangle, anchor: center
-```go
-gift.ResizeToFill(160, 160, gift.LanczosResampling, gift.CenterAnchor)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original_h.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_resize_fill.jpg)
+ name / result                              | name / result                              | name / result                              | name / result
+--------------------------------------------|--------------------------------------------|--------------------------------------------|--------------------------------------------
+resize                                      | crop_to_size                               | rotate_180                                 | rotate_30
+![](testdata/dst_resize.png)                | ![](testdata/dst_crop_to_size.png)         | ![](testdata/dst_rotate_180.png)           | ![](testdata/dst_rotate_30.png)
+brightness_increse                          | brightness_decrese                         | contrast_increse                           | contrast_decrese
+![](testdata/dst_brightness_increse.png)    | ![](testdata/dst_brightness_decrese.png)   | ![](testdata/dst_contrast_increse.png)     | ![](testdata/dst_contrast_decrese.png)
+saturation_increse                          | saturation_decrese                         | gamma_1.5                                  | gamma_0.5
+![](testdata/dst_saturation_increse.png)    | ![](testdata/dst_saturation_decrese.png)   | ![](testdata/dst_gamma_1.5.png)            | ![](testdata/dst_gamma_0.5.png)
+gaussian_blur                               | unsharp_mask                               | sigmoid                                    | pixelate
+![](testdata/dst_gaussian_blur.png)         | ![](testdata/dst_unsharp_mask.png)         | ![](testdata/dst_sigmoid.png)              | ![](testdata/dst_pixelate.png)
+colorize                                    | grayscale                                  | sepia                                      | invert
+![](testdata/dst_colorize.png)              | ![](testdata/dst_grayscale.png)            | ![](testdata/dst_sepia.png)                | ![](testdata/dst_invert.png)
+mean                                        | median                                     | minimum                                    | maximum
+![](testdata/dst_mean.png)                  | ![](testdata/dst_median.png)               | ![](testdata/dst_minimum.png)              | ![](testdata/dst_maximum.png)
+hue_rotate                                  | color_balance                              | color_func                                 | convolution_emboss
+![](testdata/dst_hue_rotate.png)            | ![](testdata/dst_color_balance.png)        | ![](testdata/dst_color_func.png)           | ![](testdata/dst_convolution_emboss.png)
 
-##### Crop 90, 90 - 250, 250
-```go
-gift.Crop(image.Rect(90, 90, 250, 250))
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_crop.jpg)
+Here's the code that produces the above images:
 
-##### Crop to size 160x160px, anchor: center
 ```go
-gift.CropToSize(160, 160, gift.CenterAnchor)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_crop_to_size.jpg)
+package main
 
-##### Rotate 90 degrees
-```go
-gift.Rotate90()
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_rotate_90.jpg)
+import (
+	"image"
+	"image/color"
+	"image/png"
+	"log"
+	"os"
 
-##### Rotate 180 degrees
-```go
-gift.Rotate180()
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_rotate_180.jpg)
-
-##### Rotate 270 degrees
-```go
-gift.Rotate270()
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_rotate_270.jpg)
-
-##### Rotate 30 degrees, white background, cubic interpolation
-```go
-gift.Rotate(30, color.White, gift.CubicInterpolation)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original_small.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_rotate_30.jpg)
-
-##### Flip horizontal
-```go
-gift.FlipHorizontal()
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_flip_h.jpg)
-
-##### Flip vertical
-```go
-gift.FlipVertical()
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_flip_v.jpg)
-
-##### Transpose
-```go
-gift.Transpose()
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_transpose.jpg)
-
-##### Transverse
-```go
-gift.Transverse()
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_transverse.jpg)
-
-##### Contrast +30%
-```go
-gift.Contrast(30)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_contrast_30.jpg)
-
-##### Contrast -30%
-```go
-gift.Contrast(-30)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_contrast_-30.jpg)
-
-##### Brightness +30%
-```go
-gift.Brightness(30)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_brightness_30.jpg)
-
-##### Brightness -30%
-```go
-gift.Brightness(-30)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_brightness_-30.jpg)
-
-##### Saturation +50%
-```go
-gift.Saturation(50)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_saturation_50.jpg)
-
-##### Saturation -50%
-```go
-gift.Saturation(-50)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_saturation_-50.jpg)
-
-##### Hue +45
-```go
-gift.Hue(45)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_hue_45.jpg)
-
-##### Hue -45
-```go
-gift.Hue(-45)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_hue_-45.jpg)
-
-##### Sigmoid 0.5, 5.0
-```go
-gift.Sigmoid(0.5, 5.0)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_sigmoid.jpg)
-
-##### Gamma correction = 0.5
-```go
-gift.Gamma(0.5)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_gamma_0.5.jpg)
-
-##### Gamma correction = 1.5
-```go
-gift.Gamma(1.5)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_gamma_1.5.jpg)
-
-##### Gaussian blur, sigma=1.0
-```go
-gift.GaussianBlur(1.0)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_gaussian_blur.jpg)
-
-##### Unsharp mask, sigma=1.0, amount=1.5, thresold=0.0
-```go
-gift.UnsharpMask(1.0, 1.5, 0.0)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_unsharp_mask.jpg)
-
-##### Grayscale
-```go
-gift.Grayscale()
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_grayscale.jpg)
-
-##### Sepia, 100%
-```go
-gift.Sepia(100)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_sepia.jpg)
-
-##### Invert
-```go
-gift.Invert()
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_invert.jpg)
-
-##### Colorize, blue, saturation=50%
-```go
-gift.Colorize(240, 50, 100)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_colorize.jpg)
-
-##### Color balance, +20% red, -20% green
-```go
-gift.ColorBalance(20, -20, 0)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_colorbalance.jpg)
-
-##### Color function
-```go
-gift.ColorFunc(
-    func(r0, g0, b0, a0 float32) (r, g, b, a float32) {
-        r = 1 - r0   // invert the red channel
-        g = g0 + 0.1 // shift the green channel by 0.1
-        b = 0        // set the blue channel to 0
-        a = a0       // preserve the alpha channel
-        return
-    },
+	"github.com/disintegration/gift"
 )
- ```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_colorfunc.jpg)
 
-##### Local mean, disc shape, size=5
-```go
-gift.Mean(5, true)
+func main() {
+	src := loadImage("testdata/src.png")
+
+	filters := map[string]gift.Filter{
+		"resize":             gift.Resize(100, 0, gift.LanczosResampling),
+		"crop_to_size":       gift.CropToSize(100, 100, gift.LeftAnchor),
+		"rotate_180":         gift.Rotate180(),
+		"rotate_30":          gift.Rotate(30, color.Transparent, gift.CubicInterpolation),
+		"brightness_increse": gift.Brightness(30),
+		"brightness_decrese": gift.Brightness(-30),
+		"contrast_increse":   gift.Contrast(30),
+		"contrast_decrese":   gift.Contrast(-30),
+		"saturation_increse": gift.Saturation(50),
+		"saturation_decrese": gift.Saturation(-50),
+		"gamma_1.5":          gift.Gamma(1.5),
+		"gamma_0.5":          gift.Gamma(0.5),
+		"gaussian_blur":      gift.GaussianBlur(1),
+		"unsharp_mask":       gift.UnsharpMask(1, 1, 0),
+		"sigmoid":            gift.Sigmoid(0.5, 7),
+		"pixelate":           gift.Pixelate(5),
+		"colorize":           gift.Colorize(240, 50, 100),
+		"grayscale":          gift.Grayscale(),
+		"sepia":              gift.Sepia(100),
+		"invert":             gift.Invert(),
+		"mean":               gift.Mean(5, true),
+		"median":             gift.Median(5, true),
+		"minimum":            gift.Minimum(5, true),
+		"maximum":            gift.Maximum(5, true),
+		"hue_rotate":         gift.Hue(45),
+		"color_balance":      gift.ColorBalance(10, -10, -10),
+		"color_func": gift.ColorFunc(
+			func(r0, g0, b0, a0 float32) (r, g, b, a float32) {
+				r = 1 - r0   // invert the red channel
+				g = g0 + 0.1 // shift the green channel by 0.1
+				b = 0        // set the blue channel to 0
+				a = a0       // preserve the alpha channel
+				return
+			},
+		),
+		"convolution_emboss": gift.Convolution(
+			[]float32{
+				-1, -1, 0,
+				-1, 1, 1,
+				0, 1, 1,
+			},
+			false, false, false, 0.0,
+		),
+	}
+
+	for name, filter := range filters {
+		g := gift.New(filter)
+		dst := image.NewRGBA(g.Bounds(src.Bounds()))
+		g.Draw(dst, src)
+		saveImage("testdata/dst_"+name+".png", dst)
+	}
+}
+
+func loadImage(filename string) image.Image {
+	f, err := os.Open(filename)
+	if err != nil {
+		log.Fatalf("os.Open failed: %v", err)
+	}
+	img, _, err := image.Decode(f)
+	if err != nil {
+		log.Fatalf("image.Decode failed: %v", err)
+	}
+	return img
+}
+
+func saveImage(filename string, img image.Image) {
+	f, err := os.Create(filename)
+	if err != nil {
+		log.Fatalf("os.Create failed: %v", err)
+	}
+	err = png.Encode(f, img)
+	if err != nil {
+		log.Fatalf("png.Encode failed: %v", err)
+	}
+}
 ```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_mean.jpg)
-
-##### Local median, disc shape, size=5
-```go
-gift.Median(5, true)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_median.jpg)
-
-##### Local minimum, disc shape, size=5
-```go
-gift.Minimum(5, true)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_minimum.jpg)
-
-##### Local maximum, disc shape, size=5
-```go
-gift.Maximum(5, true)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_maximum.jpg)
-
-##### Pixelate, size=5
-```go
-gift.Pixelate(5)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_pixelate.jpg)
-
-##### Convolution matrix - Emboss
-```go
-gift.Convolution(
-    []float32{
-        -1, -1, 0,
-        -1, 1, 1,
-        0, 1, 1,
-    },
-    false, false, false, 0.0,
-)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_convolution_emboss.jpg)
-
-##### Convolution matrix - Edge detection
-```go
-gift.Convolution(
-    []float32{
-        -1, -1, -1,
-        -1, 8, -1,
-        -1, -1, -1,
-    },
-    false, false, false, 0.0,
-)
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original2.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_edge.jpg)
-
-##### Sobel operator
-```go
-gift.Sobel()
-```
-Original image | Filtered image
---- | ---
-![original](http://disintegration.github.io/gift/examples/original2.jpg) | ![filtered](http://disintegration.github.io/gift/examples/example_sobel.jpg)
-
