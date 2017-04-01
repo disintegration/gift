@@ -141,7 +141,7 @@ func convertPalette(p []color.Color) []pixel {
 }
 
 func getPaletteIndex(pal []pixel, px pixel) int {
-	var k int = 0
+	var k int
 	var dmin float32 = 4
 	for i, palpx := range pal {
 		d := px.R - palpx.R
@@ -287,21 +287,25 @@ func (p *pixelGetter) getPixelColumn(x int, buf *[]pixel) {
 }
 
 func f32u8(val float32) uint8 {
-	if val > 255.0 {
-		val = 255.0
-	} else if val < 0.0 {
-		val = 0.0
+	x := int64(val + 0.5)
+	if x > 255 {
+		return 255
 	}
-	return uint8(val + 0.5)
+	if x > 0 {
+		return uint8(x)
+	}
+	return 0
 }
 
 func f32u16(val float32) uint16 {
-	if val > 65535.0 {
-		val = 65535.0
-	} else if val < 0.0 {
-		val = 0.0
+	x := int64(val + 0.5)
+	if x > 65535 {
+		return 65535
 	}
-	return uint16(val + 0.5)
+	if x > 0 {
+		return uint16(x)
+	}
+	return 0
 }
 
 type pixelSetter struct {
