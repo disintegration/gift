@@ -20,11 +20,11 @@ func prepareConvolutionWeights(kernel []float32, normalize bool) (int, []uvweigh
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
 			k := j*size + i
-			w := float32(0.0)
+			w := float32(0)
 			if k < len(kernel) {
 				w = kernel[k]
 			}
-			if w != 0.0 {
+			if w != 0 {
 				weights = append(weights, uvweight{u: i - center, v: j - center, weight: w})
 			}
 		}
@@ -43,9 +43,9 @@ func prepareConvolutionWeights(kernel []float32, normalize bool) (int, []uvweigh
 	}
 
 	var div float32
-	if sum != 0.0 {
+	if sum != 0 {
 		div = sum
-	} else if sumpositive != 0.0 {
+	} else if sumpositive != 0 {
 		div = sumpositive
 	} else {
 		return size, weights
@@ -140,7 +140,7 @@ func (p *convolutionFilter) Draw(dst draw.Image, src image.Image, options *Optio
 						a = absf32(a)
 					}
 				}
-				if p.delta != 0.0 {
+				if p.delta != 0 {
 					r += p.delta
 					g += p.delta
 					b += p.delta
@@ -217,7 +217,7 @@ func prepareConvolutionWeights1d(kernel []float32) (int, []uweight) {
 	center := size / 2
 	weights := []uweight{}
 	for i := 0; i < size; i++ {
-		w := float32(0.0)
+		w := float32(0)
 		if i < len(kernel) {
 			w = kernel[i]
 		}
@@ -337,12 +337,12 @@ func (p *gausssianBlurFilter) Draw(dst draw.Image, src image.Image, options *Opt
 		return
 	}
 
-	radius := int(math.Ceil(float64(p.sigma * 3.0)))
+	radius := int(math.Ceil(float64(p.sigma * 3)))
 	size := 2*radius + 1
 	center := radius
 	kernel := make([]float32, size)
 
-	kernel[center] = gaussianBlurKernel(0.0, p.sigma)
+	kernel[center] = gaussianBlurKernel(0, p.sigma)
 	sum := kernel[center]
 
 	for i := 1; i <= radius; i++ {
@@ -444,7 +444,7 @@ func (p *unsharpMaskFilter) Draw(dst draw.Image, src image.Image, options *Optio
 // Example:
 //
 //	g := gift.New(
-//		gift.UnsharpMask(1.0, 1.0, 0.0),
+//		gift.UnsharpMask(1, 1, 0),
 //	)
 //	dst := image.NewRGBA(g.Bounds(src.Bounds()))
 //	g.Draw(dst, src)
@@ -489,14 +489,14 @@ func (p *meanFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 
 	if p.disk {
 		diskKernel := genDisk(p.ksize)
-		f := Convolution(diskKernel, true, true, false, 0.0)
+		f := Convolution(diskKernel, true, true, false, 0)
 		f.Draw(dst, src, options)
 	} else {
 		kernel := make([]float32, ksize*ksize)
 		for i := range kernel {
-			kernel[i] = 1.0
+			kernel[i] = 1
 		}
-		f := Convolution(kernel, true, true, false, 0.0)
+		f := Convolution(kernel, true, true, false, 0)
 		f.Draw(dst, src, options)
 	}
 }

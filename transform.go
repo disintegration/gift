@@ -128,11 +128,11 @@ func Transverse() Filter {
 type Interpolation int
 
 const (
-	// Nearest Neighbor interpolation algorithm
+	// NearestNeighborInterpolation is a nearest-neighbor interpolation algorithm.
 	NearestNeighborInterpolation Interpolation = iota
-	// Linear interpolation algorithm
+	// LinearInterpolation is a bilinear interpolation algorithm.
 	LinearInterpolation
-	// Cubic interpolation algorithm
+	// CubicInterpolation is a bicubic interpolation algorithm.
 	CubicInterpolation
 )
 
@@ -256,9 +256,9 @@ func interpolateCubic(xf, yf float32, bounds image.Rectangle, pixGetter *pixelGe
 	}
 
 	const (
-		k04 = 1.0 / 4.0
-		k12 = 1.0 / 12.0
-		k36 = 1.0 / 36.0
+		k04 = 1 / 4.0
+		k12 = 1 / 12.0
+		k36 = 1 / 36.0
 	)
 
 	cfs[0] = k36 * xq * yq * (xq - 1) * (xq - 2) * (yq - 1) * (yq - 2)
@@ -286,7 +286,7 @@ func interpolateCubic(xf, yf float32, bounds image.Rectangle, pixGetter *pixelGe
 		px.A += wa
 	}
 
-	if px.A != 0.0 {
+	if px.A != 0 {
 		px.R /= px.A
 		px.G /= px.A
 		px.B /= px.A
@@ -330,7 +330,7 @@ func interpolateLinear(xf, yf float32, bounds image.Rectangle, pixGetter *pixelG
 		px.A += wa
 	}
 
-	if px.A != 0.0 {
+	if px.A != 0 {
 		px.R /= px.A
 		px.G /= px.A
 		px.B /= px.A
@@ -418,6 +418,7 @@ func Crop(rect image.Rectangle) Filter {
 // Anchor is the anchor point for image cropping.
 type Anchor int
 
+// Anchor point positions.
 const (
 	CenterAnchor Anchor = iota
 	TopLeftAnchor

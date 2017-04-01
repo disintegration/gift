@@ -26,7 +26,7 @@ func TestLut(t *testing.T) {
 		}
 	}
 	lut := prepareLut(10000, fn)
-	for _, u := range []float32{0.0, 0.0001, 0.5555, 0.9999, 1.0} {
+	for _, u := range []float32{0, 0.0001, 0.5555, 0.9999, 1} {
 		v := getFromLut(lut, u)
 		if math.Abs(float64(v-u)) > 0.0001 {
 			t.Errorf("LUT bad value: expected %v got %v", u, v)
@@ -73,7 +73,7 @@ func TestColorspaceSRGBToLinear(t *testing.T) {
 	}
 	for _, img := range imgs {
 		for i := 0; i <= 10; i++ {
-			img.Set(i, 0, color.Gray{uint8(255 * float32(i) / 10.0)})
+			img.Set(i, 0, color.Gray{uint8(255 * i / 10.0)})
 		}
 		img2 := image.NewGray(img.Bounds())
 		New(ColorspaceSRGBToLinear()).Draw(img2, img)
@@ -81,7 +81,7 @@ func TestColorspaceSRGBToLinear(t *testing.T) {
 			t.Errorf("ColorspaceSRGBToLinear bad result size: expected %v got %v", img.Bounds().Size(), img2.Bounds().Size())
 		}
 		for i := 0; i <= 10; i++ {
-			expected := uint8(vals[i]*255.0 + 0.5)
+			expected := uint8(vals[i]*255 + 0.5)
 			c := img2.At(i, 0).(color.Gray)
 			if math.Abs(float64(c.Y)-float64(expected)) > 1 {
 				t.Errorf("ColorspaceSRGBToLinear bad color value at index %v expected %v got %v", i, expected, c.Y)
@@ -113,7 +113,7 @@ func TestColorspaceLinearToSRGB(t *testing.T) {
 	}
 	for _, img := range imgs {
 		for i := 0; i <= 10; i++ {
-			img.Set(i, 0, color.Gray{uint8(255 * float32(i) / 10.0)})
+			img.Set(i, 0, color.Gray{uint8(255 * i / 10.0)})
 		}
 		img2 := image.NewGray(img.Bounds())
 		New(ColorspaceLinearToSRGB()).Draw(img2, img)
@@ -121,7 +121,7 @@ func TestColorspaceLinearToSRGB(t *testing.T) {
 			t.Errorf("ColorspaceLinearRGBToSRGB bad result size: expected %v got %v", img.Bounds().Size(), img2.Bounds().Size())
 		}
 		for i := 0; i <= 10; i++ {
-			expected := uint8(vals[i]*255.0 + 0.5)
+			expected := uint8(vals[i]*255 + 0.5)
 			c := img2.At(i, 0).(color.Gray)
 			if math.Abs(float64(c.Y)-float64(expected)) > 1 {
 				t.Errorf("ColorspaceLinearRGBToSRGB bad color value at index %v expected %v got %v", i, expected, c.Y)
@@ -137,7 +137,7 @@ func TestAdjustGamma(t *testing.T) {
 	for i := 0; i <= 255; i++ {
 		src.Pix[i] = uint8(i)
 	}
-	ag := Gamma(2.0)
+	ag := Gamma(2)
 	ag.Draw(dst, src, nil)
 
 	for i := 100; i <= 150; i++ {
@@ -155,7 +155,7 @@ func TestAdjustGamma(t *testing.T) {
 		}
 	}
 
-	ag = Gamma(1.0)
+	ag = Gamma(1)
 	ag.Draw(dst, src, nil)
 
 	for i := 100; i <= 150; i++ {

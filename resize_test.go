@@ -37,7 +37,7 @@ func TestResize(t *testing.T) {
 			for _, f := range rfilters {
 				g := New(Resize(z.w0, z.h0, f))
 				g.SetParallelization(prlz)
-				img1 := image.NewGray(g.Bounds(img0.Bounds()))
+				img1 = image.NewGray(g.Bounds(img0.Bounds()))
 				g.Draw(img1, img0)
 				w2, h2 := img1.Bounds().Dx(), img1.Bounds().Dy()
 				if w2 != z.w1 || h2 != z.h1 {
@@ -108,8 +108,8 @@ func TestResize(t *testing.T) {
 	if sinc(0) != 1 {
 		t.Errorf("sinc(0) != 1")
 	}
-	if bcspline(-2.0, 0.0, 0.5) != 0 {
-		t.Errorf("bcspline(2.0, ...) != 0")
+	if bcspline(-2, 0, 0.5) != 0 {
+		t.Errorf("bcspline(-2, ...) != 0")
 	}
 
 	if (resamp{name: "test"}).String() != "test" {

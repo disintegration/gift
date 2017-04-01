@@ -144,7 +144,7 @@ func TestConvolution(t *testing.T) {
 				0, 0, 0,
 				0, 0, 0,
 			},
-			false, false, true, 0.0,
+			false, false, true, 0,
 			image.Rect(-1, -1, 2, 2),
 			image.Rect(0, 0, 3, 3),
 			[]uint8{
@@ -237,8 +237,8 @@ func TestGaussianBlur(t *testing.T) {
 		srcPix, dstPix []uint8
 	}{
 		{
-			"blur (0.0)",
-			0.0,
+			"blur (0)",
+			0,
 			image.Rect(-1, -1, 4, 2),
 			image.Rect(0, 0, 5, 3),
 			[]uint8{
@@ -269,8 +269,8 @@ func TestGaussianBlur(t *testing.T) {
 			},
 		},
 		{
-			"blur (1.0)",
-			1.0,
+			"blur (1)",
+			1,
 			image.Rect(-1, -1, 4, 2),
 			image.Rect(0, 0, 5, 3),
 			[]uint8{
@@ -285,8 +285,8 @@ func TestGaussianBlur(t *testing.T) {
 			},
 		},
 		{
-			"blur (3.0)",
-			3.0,
+			"blur (3)",
+			3,
 			image.Rect(-1, -1, 4, 2),
 			image.Rect(0, 0, 5, 3),
 			[]uint8{
@@ -328,8 +328,8 @@ func TestUnsharpMask(t *testing.T) {
 		srcPix, dstPix          []uint8
 	}{
 		{
-			"unsharp mask (0.3, 1.0, 0.0)",
-			0.3, 1.0, 0.0,
+			"unsharp mask (0.3, 1, 0)",
+			0.3, 1, 0,
 			image.Rect(-1, -1, 4, 2),
 			image.Rect(0, 0, 5, 3),
 			[]uint8{
@@ -344,8 +344,8 @@ func TestUnsharpMask(t *testing.T) {
 			},
 		},
 		{
-			"unsharp mask (1.0, 1.0, 0.0)",
-			1.0, 1.0, 0.0,
+			"unsharp mask (1, 1, 0)",
+			1, 1, 0,
 			image.Rect(-1, -1, 4, 2),
 			image.Rect(0, 0, 5, 3),
 			[]uint8{
@@ -360,8 +360,8 @@ func TestUnsharpMask(t *testing.T) {
 			},
 		},
 		{
-			"unsharp mask (1.0, 0.5, 0.0)",
-			1.0, 0.5, 0.0,
+			"unsharp mask (1, 0.5, 0)",
+			1, 0.5, 0,
 			image.Rect(-1, -1, 4, 2),
 			image.Rect(0, 0, 5, 3),
 			[]uint8{
@@ -376,8 +376,8 @@ func TestUnsharpMask(t *testing.T) {
 			},
 		},
 		{
-			"unsharp mask (1.0, 1.0, 0.05)",
-			1.0, 1.0, 0.05,
+			"unsharp mask (1, 1, 0.05)",
+			1, 1, 0.05,
 			image.Rect(-1, -1, 4, 2),
 			image.Rect(0, 0, 5, 3),
 			[]uint8{
@@ -407,7 +407,7 @@ func TestUnsharpMask(t *testing.T) {
 	}
 
 	// check no panics
-	UnsharpMask(0.5, 1.0, 0.0).Draw(image.NewGray(image.Rect(0, 0, 0, 0)), image.NewGray(image.Rect(0, 0, 0, 0)), nil)
+	UnsharpMask(0.5, 1, 0).Draw(image.NewGray(image.Rect(0, 0, 0, 0)), image.NewGray(image.Rect(0, 0, 0, 0)), nil)
 }
 
 func TestMean(t *testing.T) {

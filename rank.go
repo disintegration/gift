@@ -72,7 +72,7 @@ func (p *rankFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 
 		for y := pmin; y < pmax; y++ {
 			// init buffer
-			pxbuf = pxbuf[0:0]
+			pxbuf = pxbuf[:0]
 			for i := srcb.Min.X - kradius; i <= srcb.Min.X+kradius; i++ {
 				for j := y - kradius; j <= y+kradius; j++ {
 					kx, ky := i, j
@@ -93,16 +93,16 @@ func (p *rankFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 			for x := srcb.Min.X; x < srcb.Max.X; x++ {
 				var r, g, b, a float32
 				if p.mode == rankMedian {
-					rbuf = rbuf[0:0]
-					gbuf = gbuf[0:0]
-					bbuf = bbuf[0:0]
+					rbuf = rbuf[:0]
+					gbuf = gbuf[:0]
+					bbuf = bbuf[:0]
 					if !opaque {
-						abuf = abuf[0:0]
+						abuf = abuf[:0]
 					}
 				} else if p.mode == rankMin {
-					r, g, b, a = 1.0, 1.0, 1.0, 1.0
+					r, g, b, a = 1, 1, 1, 1
 				} else if p.mode == rankMax {
-					r, g, b, a = 0.0, 0.0, 0.0, 0.0
+					r, g, b, a = 0, 0, 0, 0
 				}
 
 				sz := 0
@@ -110,7 +110,7 @@ func (p *rankFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 					for j := 0; j < ksize; j++ {
 
 						if p.disk {
-							if disk[i*ksize+j] == 0.0 {
+							if disk[i*ksize+j] == 0 {
 								continue
 							}
 						}
@@ -158,7 +158,7 @@ func (p *rankFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 				}
 
 				if opaque {
-					a = 1.0
+					a = 1
 				}
 
 				pixSetter.setPixel(dstb.Min.X+x-srcb.Min.X, dstb.Min.Y+y-srcb.Min.Y, pixel{r, g, b, a})

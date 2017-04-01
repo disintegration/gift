@@ -27,11 +27,11 @@ func TestGIFT(t *testing.T) {
 		t.Error("unexpected parallelization property")
 	}
 	g.SetParallelization(true)
-	if g.Parallelization() != true {
+	if !g.Parallelization() {
 		t.Error("unexpected parallelization property")
 	}
 	g.SetParallelization(false)
-	if g.Parallelization() != false {
+	if g.Parallelization() {
 		t.Error("unexpected parallelization property")
 	}
 
@@ -471,7 +471,7 @@ func TestDraw(t *testing.T) {
 		{ColorspaceLinearToSRGB()},
 		{ColorspaceSRGBToLinear()},
 		{Contrast(10)},
-		{Convolution([]float32{-1, -1, 0, -1, 1, 1, 0, 1, 1}, false, false, false, 0.0)},
+		{Convolution([]float32{-1, -1, 0, -1, 1, 1, 0, 1, 1}, false, false, false, 0)},
 		{Gamma(1.1)},
 		{GaussianBlur(3)},
 		{Grayscale()},
@@ -486,7 +486,7 @@ func TestDraw(t *testing.T) {
 		{Sepia(10)},
 		{Sigmoid(0.5, 5)},
 		{Sobel()},
-		{UnsharpMask(1.0, 1.5, 0.001)},
+		{UnsharpMask(1, 1.5, 0.001)},
 	}
 
 	for i, f := range filters {

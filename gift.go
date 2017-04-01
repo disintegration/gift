@@ -8,7 +8,7 @@ Basic usage:
 
 	g := gift.New(
 	    gift.Resize(800, 0, gift.LanczosResampling),
-	    gift.UnsharpMask(1.0, 1.0, 0.0),
+	    gift.UnsharpMask(1, 1, 0),
 	)
 
 	// 2. Create a new image of the corresponding size.
@@ -136,6 +136,7 @@ func (g *GIFT) Draw(dst draw.Image, src image.Image) {
 // Operator is an image composition operator.
 type Operator int
 
+// Composition operators.
 const (
 	CopyOperator Operator = iota
 	OverOperator

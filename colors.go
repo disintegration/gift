@@ -85,7 +85,7 @@ func (p *colorchanFilter) Draw(dst draw.Image, src image.Image, options *Options
 func Invert() Filter {
 	return &colorchanFilter{
 		fn: func(x float32) float32 {
-			return 1.0 - x
+			return 1 - x
 		},
 		lut: false,
 	}
@@ -111,17 +111,17 @@ func ColorspaceLinearToSRGB() Filter {
 			if x <= 0.0031308 {
 				return x * 12.92
 			}
-			return float32(1.055*math.Pow(float64(x), 1.0/2.4) - 0.055)
+			return float32(1.055*math.Pow(float64(x), 1/2.4) - 0.055)
 		},
 		lut: true,
 	}
 }
 
 // Gamma creates a filter that performs a gamma correction on an image.
-// The gamma parameter must be positive. Gamma = 1.0 gives the original image.
-// Gamma less than 1.0 darkens the image and gamma greater than 1.0 lightens it.
+// The gamma parameter must be positive. Gamma = 1 gives the original image.
+// Gamma less than 1 darkens the image and gamma greater than 1 lightens it.
 func Gamma(gamma float32) Filter {
-	e := 1.0 / maxf32(gamma, 1.0e-5)
+	e := 1 / maxf32(gamma, 1.0e-5)
 	return &colorchanFilter{
 		fn: func(x float32) float32 {
 			return powf32(x, e)
@@ -143,13 +143,13 @@ func sigmoid(a, b, x float32) float32 {
 // Example:
 //
 //	g := gift.New(
-//		gift.Sigmoid(0.5, 3.0),
+//		gift.Sigmoid(0.5, 5),
 //	)
 //	dst := image.NewRGBA(g.Bounds(src.Bounds()))
 //	g.Draw(dst, src)
 //
 func Sigmoid(midpoint, factor float32) Filter {
-	a := minf32(maxf32(midpoint, 0.0), 1.0)
+	a := minf32(maxf32(midpoint, 0), 1)
 	b := absf32(factor)
 	sig0 := sigmoid(a, b, 0)
 	sig1 := sigmoid(a, b, 1)
@@ -163,8 +163,8 @@ func Sigmoid(midpoint, factor float32) Filter {
 				sig := sigmoid(a, b, x)
 				return (sig - sig0) / (sig1 - sig0)
 			} else {
-				arg := minf32(maxf32((sig1-sig0)*x+sig0, e), 1.0-e)
-				return a - logf32(1.0/arg-1.0)/b
+				arg := minf32(maxf32((sig1-sig0)*x+sig0, e), 1-e)
+				return a - logf32(1/arg-1)/b
 			}
 		},
 		lut: true,
@@ -179,7 +179,7 @@ func Contrast(percentage float32) Filter {
 		return &copyimageFilter{}
 	}
 
-	p := 1 + minf32(maxf32(percentage, -100.0), 100.0)/100.0
+	p := 1 + minf32(maxf32(percentage, -100), 100)/100
 
 	return &colorchanFilter{
 		fn: func(x float32) float32 {
@@ -189,9 +189,9 @@ func Contrast(percentage float32) Filter {
 				return 0.5 + (x-0.5)*(1/(2.0-p))
 			} else {
 				if x < 0.5 {
-					return 0.0
+					return 0
 				}
-				return 1.0
+				return 1
 			}
 		},
 		lut: false,
@@ -206,7 +206,7 @@ func Brightness(percentage float32) Filter {
 		return &copyimageFilter{}
 	}
 
-	shift := minf32(maxf32(percentage, -100.0), 100.0) / 100.0
+	shift := minf32(maxf32(percentage, -100), 100) / 100
 
 	return &colorchanFilter{
 		fn: func(x float32) float32 {
@@ -267,16 +267,16 @@ func Grayscale() Filter {
 //	g.Draw(dst, src)
 //
 func Sepia(percentage float32) Filter {
-	adjustAmount := minf32(maxf32(percentage, 0.0), 100.0) / 100.0
-	rr := 1.0 - 0.607*adjustAmount
+	adjustAmount := minf32(maxf32(percentage, 0), 100) / 100
+	rr := 1 - 0.607*adjustAmount
 	rg := 0.769 * adjustAmount
 	rb := 0.189 * adjustAmount
 	gr := 0.349 * adjustAmount
-	gg := 1.0 - 0.314*adjustAmount
+	gg := 1 - 0.314*adjustAmount
 	gb := 0.168 * adjustAmount
 	br := 0.272 * adjustAmount
 	bg := 0.534 * adjustAmount
-	bb := 1.0 - 0.869*adjustAmount
+	bb := 1 - 0.869*adjustAmount
 	return &colorFilter{
 		fn: func(px pixel) pixel {
 			r := px.R*rr + px.G*rg + px.B*rb
@@ -288,40 +288,40 @@ func Sepia(percentage float32) Filter {
 }
 
 func convertHSLToRGB(h, s, l float32) (float32, float32, float32) {
-	if s == 0.0 {
+	if s == 0 {
 		return l, l, l
 	}
 
 	_v := func(p, q, t float32) float32 {
-		if t < 0.0 {
-			t += 1.0
+		if t < 0 {
+			t++
 		}
-		if t > 1.0 {
-			t -= 1.0
+		if t > 1 {
+			t--
 		}
-		if t < 1.0/6.0 {
-			return p + (q-p)*6.0*t
+		if t < 1/6.0 {
+			return p + (q-p)*6*t
 		}
-		if t < 1.0/2.0 {
+		if t < 1/2.0 {
 			return q
 		}
-		if t < 2.0/3.0 {
-			return p + (q-p)*(2.0/3.0-t)*6.0
+		if t < 2/3.0 {
+			return p + (q-p)*(2/3.0-t)*6
 		}
 		return p
 	}
 
 	var p, q float32
 	if l < 0.5 {
-		q = l * (1.0 + s)
+		q = l * (1 + s)
 	} else {
 		q = l + s - l*s
 	}
-	p = 2.0*l - q
+	p = 2*l - q
 
-	r := _v(p, q, h+1.0/3.0)
+	r := _v(p, q, h+1/3.0)
 	g := _v(p, q, h)
-	b := _v(p, q, h-1.0/3.0)
+	b := _v(p, q, h-1/3.0)
 
 	return r, g, b
 }
@@ -330,16 +330,16 @@ func convertRGBToHSL(r, g, b float32) (float32, float32, float32) {
 	max := maxf32(r, maxf32(g, b))
 	min := minf32(r, minf32(g, b))
 
-	l := (max + min) / 2.0
+	l := (max + min) / 2
 
 	if max == min {
-		return 0.0, 0.0, l
+		return 0, 0, l
 	}
 
 	var h, s float32
 	d := max - min
 	if l > 0.5 {
-		s = d / (2.0 - max - min)
+		s = d / (2 - max - min)
 	} else {
 		s = d / (max + min)
 	}
@@ -347,14 +347,14 @@ func convertRGBToHSL(r, g, b float32) (float32, float32, float32) {
 	if r == max {
 		h = (g - b) / d
 		if g < b {
-			h += 6.0
+			h += 6
 		}
 	} else if g == max {
-		h = (b-r)/d + 2.0
+		h = (b-r)/d + 2
 	} else {
-		h = (r-g)/d + 4.0
+		h = (r-g)/d + 4
 	}
-	h /= 6.0
+	h /= 6
 
 	return h, s, l
 }
@@ -371,7 +371,7 @@ func normalizeHue(hue float32) float32 {
 // The shift parameter is the hue angle shift, typically in range (-180, 180).
 // The shift = 0 gives the original image.
 func Hue(shift float32) Filter {
-	p := normalizeHue(shift / 360.0)
+	p := normalizeHue(shift / 360)
 	if p == 0 {
 		return &copyimageFilter{}
 	}
@@ -389,7 +389,7 @@ func Hue(shift float32) Filter {
 // Saturation creates a filter that changes the saturation of an image.
 // The percentage parameter must be in range (-100, 500). The percentage = 0 gives the original image.
 func Saturation(percentage float32) Filter {
-	p := 1 + minf32(maxf32(percentage, -100.0), 500.0)/100.0
+	p := 1 + minf32(maxf32(percentage, -100), 500)/100
 	if p == 1 {
 		return &copyimageFilter{}
 	}

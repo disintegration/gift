@@ -13,13 +13,13 @@ type Resampling interface {
 }
 
 func bcspline(x, b, c float32) float32 {
-	if x < 0.0 {
+	if x < 0 {
 		x = -x
 	}
-	if x < 1.0 {
+	if x < 1 {
 		return ((12-9*b-6*c)*x*x*x + (-18+12*b+6*c)*x*x + (6 - 2*b)) / 6
 	}
-	if x < 2.0 {
+	if x < 2 {
 		return ((-b-6*c)*x*x*x + (6*b+30*c)*x*x + (-12*b-48*c)*x + (8*b + 24*c)) / 6
 	}
 	return 0
@@ -27,7 +27,7 @@ func bcspline(x, b, c float32) float32 {
 
 func sinc(x float32) float32 {
 	if x == 0 {
-		return 1.0
+		return 1
 	}
 	return float32(math.Sin(math.Pi*float64(x)) / (math.Pi * float64(x)))
 }
@@ -50,26 +50,26 @@ func (r resamp) Kernel(x float32) float32 {
 	return r.kernel(x)
 }
 
-// Nearest neighbor resampling filter.
+// NearestNeighborResampling is a nearest neighbor resampling filter.
 var NearestNeighborResampling Resampling
 
-// Box resampling filter.
+// BoxResampling is a box resampling filter (average of surrounding pixels).
 var BoxResampling Resampling
 
-// Linear resampling filter.
+// LinearResampling is a bilinear resampling filter.
 var LinearResampling Resampling
 
-// Cubic resampling filter (Catmull-Rom).
+// CubicResampling is a bicubic resampling filter (Catmull-Rom).
 var CubicResampling Resampling
 
-// Lanczos resampling filter (3 lobes).
+// LanczosResampling is a Lanczos resampling filter (3 lobes).
 var LanczosResampling Resampling
 
 func precomputeResamplingWeights(dstSize, srcSize int, resampling Resampling) [][]uweight {
 	du := float32(srcSize) / float32(dstSize)
 	scale := du
-	if scale < 1.0 {
-		scale = 1.0
+	if scale < 1 {
+		scale = 1
 	}
 	ru := float32(math.Ceil(float64(scale * resampling.Support())))
 
@@ -88,14 +88,14 @@ func precomputeResamplingWeights(dstSize, srcSize int, resampling Resampling) []
 			endu = srcSize - 1
 		}
 
-		sumf := float32(0.0)
+		sumf := float32(0)
 		for u := startu; u <= endu; u++ {
 			w := resampling.Kernel((float32(u) - fU) / scale)
 			sumf += w
 			tmp[u-startu] = w
 		}
 		for u := startu; u <= endu; u++ {
-			w := float32(tmp[u-startu] / sumf)
+			w := tmp[u-startu] / sumf
 			result[v] = append(result[v], uweight{u, w})
 		}
 	}
@@ -200,11 +200,11 @@ func (p *resizeFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectan
 		dstBounds = image.Rect(0, 0, 0, 0)
 	} else if w == 0 {
 		fw := float64(h) * float64(srcw) / float64(srch)
-		dstw := int(math.Max(1.0, math.Floor(fw+0.5)))
+		dstw := int(math.Max(1, math.Floor(fw+0.5)))
 		dstBounds = image.Rect(0, 0, dstw, h)
 	} else if h == 0 {
 		fh := float64(w) * float64(srch) / float64(srcw)
-		dsth := int(math.Max(1.0, math.Floor(fh+0.5)))
+		dsth := int(math.Max(1, math.Floor(fh+0.5)))
 		dstBounds = image.Rect(0, 0, w, dsth)
 	} else {
 		dstBounds = image.Rect(0, 0, w, h)
@@ -384,7 +384,7 @@ func init() {
 	// Nearest neighbor resampling filter.
 	NearestNeighborResampling = resamp{
 		name:    "NearestNeighborResampling",
-		support: 0.0,
+		support: 0,
 		kernel: func(x float32) float32 {
 			return 0
 		},
@@ -395,11 +395,11 @@ func init() {
 		name:    "BoxResampling",
 		support: 0.5,
 		kernel: func(x float32) float32 {
-			if x < 0.0 {
+			if x < 0 {
 				x = -x
 			}
 			if x <= 0.5 {
-				return 1.0
+				return 1
 			}
 			return 0
 		},
@@ -408,13 +408,13 @@ func init() {
 	// Linear resampling filter.
 	LinearResampling = resamp{
 		name:    "LinearResampling",
-		support: 1.0,
+		support: 1,
 		kernel: func(x float32) float32 {
-			if x < 0.0 {
+			if x < 0 {
 				x = -x
 			}
-			if x < 1.0 {
-				return 1.0 - x
+			if x < 1 {
+				return 1 - x
 			}
 			return 0
 		},
@@ -423,13 +423,13 @@ func init() {
 	// Cubic resampling filter (Catmull-Rom).
 	CubicResampling = resamp{
 		name:    "CubicResampling",
-		support: 2.0,
+		support: 2,
 		kernel: func(x float32) float32 {
-			if x < 0.0 {
+			if x < 0 {
 				x = -x
 			}
-			if x < 2.0 {
-				return bcspline(x, 0.0, 0.5)
+			if x < 2 {
+				return bcspline(x, 0, 0.5)
 			}
 			return 0
 		},
@@ -438,13 +438,13 @@ func init() {
 	// Lanczos resampling filter (3 lobes).
 	LanczosResampling = resamp{
 		name:    "LanczosResampling",
-		support: 3.0,
+		support: 3,
 		kernel: func(x float32) float32 {
-			if x < 0.0 {
+			if x < 0 {
 				x = -x
 			}
-			if x < 3.0 {
-				return sinc(x) * sinc(x/3.0)
+			if x < 3 {
+				return sinc(x) * sinc(x/3)
 			}
 			return 0
 		},

@@ -27,7 +27,7 @@ http://godoc.org/github.com/disintegration/gift
 // 1. Create a new GIFT filter list and add some filters:
 g := gift.New(
     gift.Resize(800, 0, gift.LanczosResampling),
-    gift.UnsharpMask(1.0, 1.0, 0.0),
+    gift.UnsharpMask(1, 1, 0),
 )
 
 // 2. Create a new image of the corresponding size.
@@ -215,7 +215,7 @@ func main() {
 				-1, 1, 1,
 				0, 1, 1,
 			},
-			false, false, false, 0.0,
+			false, false, false, 0,
 		),
 	}
 

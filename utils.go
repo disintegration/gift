@@ -194,7 +194,7 @@ func genDisk(ksize int) []float32 {
 			y := kcenter - j
 			r := math.Sqrt(float64(x*x + y*y))
 			if r <= float64(ksize/2) {
-				disk[j*ksize+i] = 1.0
+				disk[j*ksize+i] = 1
 			}
 		}
 	}
