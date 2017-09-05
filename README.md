@@ -142,10 +142,10 @@ Resulting images after applying some of the filters:
 --------------------------------------------|--------------------------------------------|--------------------------------------------|--------------------------------------------
 resize                                      | crop_to_size                               | rotate_180                                 | rotate_30
 ![](testdata/dst_resize.png)                | ![](testdata/dst_crop_to_size.png)         | ![](testdata/dst_rotate_180.png)           | ![](testdata/dst_rotate_30.png)
-brightness_increse                          | brightness_decrese                         | contrast_increse                           | contrast_decrese
-![](testdata/dst_brightness_increse.png)    | ![](testdata/dst_brightness_decrese.png)   | ![](testdata/dst_contrast_increse.png)     | ![](testdata/dst_contrast_decrese.png)
-saturation_increse                          | saturation_decrese                         | gamma_1.5                                  | gamma_0.5
-![](testdata/dst_saturation_increse.png)    | ![](testdata/dst_saturation_decrese.png)   | ![](testdata/dst_gamma_1.5.png)            | ![](testdata/dst_gamma_0.5.png)
+brightness_increase                         | brightness_decrease                        | contrast_increase                          | contrast_decrease
+![](testdata/dst_brightness_increase.png)   | ![](testdata/dst_brightness_decrease.png)  | ![](testdata/dst_contrast_increase.png)    | ![](testdata/dst_contrast_decrease.png)
+saturation_increase                         | saturation_decrease                        | gamma_1.5                                  | gamma_0.5
+![](testdata/dst_saturation_increase.png)   | ![](testdata/dst_saturation_decrease.png)  | ![](testdata/dst_gamma_1.5.png)            | ![](testdata/dst_gamma_0.5.png)
 gaussian_blur                               | unsharp_mask                               | sigmoid                                    | pixelate
 ![](testdata/dst_gaussian_blur.png)         | ![](testdata/dst_unsharp_mask.png)         | ![](testdata/dst_sigmoid.png)              | ![](testdata/dst_pixelate.png)
 colorize                                    | grayscale                                  | sepia                                      | invert
@@ -174,32 +174,32 @@ func main() {
 	src := loadImage("testdata/src.png")
 
 	filters := map[string]gift.Filter{
-		"resize":             gift.Resize(100, 0, gift.LanczosResampling),
-		"crop_to_size":       gift.CropToSize(100, 100, gift.LeftAnchor),
-		"rotate_180":         gift.Rotate180(),
-		"rotate_30":          gift.Rotate(30, color.Transparent, gift.CubicInterpolation),
-		"brightness_increse": gift.Brightness(30),
-		"brightness_decrese": gift.Brightness(-30),
-		"contrast_increse":   gift.Contrast(30),
-		"contrast_decrese":   gift.Contrast(-30),
-		"saturation_increse": gift.Saturation(50),
-		"saturation_decrese": gift.Saturation(-50),
-		"gamma_1.5":          gift.Gamma(1.5),
-		"gamma_0.5":          gift.Gamma(0.5),
-		"gaussian_blur":      gift.GaussianBlur(1),
-		"unsharp_mask":       gift.UnsharpMask(1, 1, 0),
-		"sigmoid":            gift.Sigmoid(0.5, 7),
-		"pixelate":           gift.Pixelate(5),
-		"colorize":           gift.Colorize(240, 50, 100),
-		"grayscale":          gift.Grayscale(),
-		"sepia":              gift.Sepia(100),
-		"invert":             gift.Invert(),
-		"mean":               gift.Mean(5, true),
-		"median":             gift.Median(5, true),
-		"minimum":            gift.Minimum(5, true),
-		"maximum":            gift.Maximum(5, true),
-		"hue_rotate":         gift.Hue(45),
-		"color_balance":      gift.ColorBalance(10, -10, -10),
+		"resize":               gift.Resize(100, 0, gift.LanczosResampling),
+		"crop_to_size":         gift.CropToSize(100, 100, gift.LeftAnchor),
+		"rotate_180":           gift.Rotate180(),
+		"rotate_30":            gift.Rotate(30, color.Transparent, gift.CubicInterpolation),
+		"brightness_increase":  gift.Brightness(30),
+		"brightness_decrease":  gift.Brightness(-30),
+		"contrast_increase":    gift.Contrast(30),
+		"contrast_decrease":    gift.Contrast(-30),
+		"saturation_increase":  gift.Saturation(50),
+		"saturation_decrease":  gift.Saturation(-50),
+		"gamma_1.5":            gift.Gamma(1.5),
+		"gamma_0.5":            gift.Gamma(0.5),
+		"gaussian_blur":        gift.GaussianBlur(1),
+		"unsharp_mask":         gift.UnsharpMask(1, 1, 0),
+		"sigmoid":              gift.Sigmoid(0.5, 7),
+		"pixelate":             gift.Pixelate(5),
+		"colorize":             gift.Colorize(240, 50, 100),
+		"grayscale":            gift.Grayscale(),
+		"sepia":                gift.Sepia(100),
+		"invert":               gift.Invert(),
+		"mean":                 gift.Mean(5, true),
+		"median":               gift.Median(5, true),
+		"minimum":              gift.Minimum(5, true),
+		"maximum":              gift.Maximum(5, true),
+		"hue_rotate":           gift.Hue(45),
+		"color_balance":        gift.ColorBalance(10, -10, -10),
 		"color_func": gift.ColorFunc(
 			func(r0, g0, b0, a0 float32) (r, g, b, a float32) {
 				r = 1 - r0   // invert the red channel
