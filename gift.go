@@ -61,10 +61,6 @@ func New(filters ...Filter) *GIFT {
 
 // SetParallelization enables or disables faster image processing using parallel goroutines.
 // Parallelization is enabled by default.
-// To achieve maximum performance, make sure to allow Go to utilize all CPU cores:
-//
-// 	runtime.GOMAXPROCS(runtime.NumCPU())
-//
 func (g *GIFT) SetParallelization(isEnabled bool) {
 	g.Options.Parallelization = isEnabled
 }

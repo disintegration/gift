@@ -26,8 +26,8 @@ http://godoc.org/github.com/disintegration/gift
 ```go
 // 1. Create a new GIFT filter list and add some filters:
 g := gift.New(
-    gift.Resize(800, 0, gift.LanczosResampling),
-    gift.UnsharpMask(1, 1, 0),
+	gift.Resize(800, 0, gift.LanczosResampling),
+	gift.UnsharpMask(1, 1, 0),
 )
 
 // 2. Create a new image of the corresponding size.
@@ -43,8 +43,8 @@ g.Draw(dst, src)
 To create a sequence of filters, the `New` function is used:
  ```go
 g := gift.New(
-    gift.Grayscale(),
-    gift.Contrast(10),
+	gift.Grayscale(),
+	gift.Contrast(10),
 )
  ```
 Filters also can be added using the `Add` method:
@@ -76,8 +76,8 @@ Two image composition operators are supported by now:
 
 Empty filter list can be used to create a copy of an image or to paste one image to another. For example:
 ```go
-// Create a new image with dimensions of bgImage
-dstImage := image.NewNRGBA(bgImage.Bounds())
+// Create a new image with dimensions of the bgImage.
+dstImage := image.NewRGBA(bgImage.Bounds())
 // Copy the bgImage to the dstImage.
 gift.New().Draw(dstImage, bgImage)
 // Draw the fgImage over the dstImage at the (100, 100) position.
