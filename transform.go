@@ -202,7 +202,7 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 	dstxoff := float32(w)/2 - 0.5
 	dstyoff := float32(h)/2 - 0.5
 
-	bgpx := pixelclr(p.bgcolor)
+	bgpx := pixelFromColor(p.bgcolor)
 	asin, acos := sincosf32(p.angle)
 
 	pixGetter := newPixelGetter(src)

@@ -48,7 +48,7 @@ func (p *colorchanFilter) Draw(dst draw.Image, src image.Image, options *Options
 	if p.lut {
 		var lutSize int
 
-		it := pixGetter.imgType
+		it := pixGetter.it
 		if it == itNRGBA || it == itRGBA || it == itGray || it == itYCbCr {
 			lutSize = 0xff + 1
 		} else {
