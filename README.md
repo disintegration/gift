@@ -12,13 +12,11 @@ Pure Go. No external dependencies outside of the Go standard library.
 ### INSTALLATION / UPDATING
 
     go get -u github.com/disintegration/gift
-  
 
 
 ### DOCUMENTATION
 
 http://godoc.org/github.com/disintegration/gift
-  
 
 
 ### QUICK START
@@ -41,14 +39,14 @@ g.Draw(dst, src)
 ### USAGE
 
 To create a sequence of filters, the `New` function is used:
- ```go
+```go
 g := gift.New(
 	gift.Grayscale(),
 	gift.Contrast(10),
 )
- ```
+```
 Filters also can be added using the `Add` method:
- ```go
+```go
 g.Add(GaussianBlur(2)) 
 ```
 
@@ -61,14 +59,14 @@ dst := image.NewRGBA(g.Bounds(src.Bounds()))
 There are two methods available to apply these filters to an image:
 
 - `Draw` applies all the added filters to the src image and outputs the result to the dst image starting from the top-left corner (Min point).
- ```go
- g.Draw(dst, src)
- ```
+```go
+g.Draw(dst, src)
+```
 
 - `DrawAt` provides more control. It outputs the filtered src image to the dst image at the specified position using the specified image composition operator. This example is equivalent to the previous:
- ```go
- g.DrawAt(dst, src, dst.Bounds().Min, gift.CopyOperator)
- ```
+```go
+g.DrawAt(dst, src, dst.Bounds().Min, gift.CopyOperator)
+```
 
 Two image composition operators are supported by now:
 - `CopyOperator` - Replaces pixels of the dst image with pixels of the filtered src image. This mode is used by the Draw method.
