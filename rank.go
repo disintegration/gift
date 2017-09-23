@@ -143,11 +143,11 @@ func (p *rankFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 				}
 
 				if p.mode == rankMedian {
-					qsortf32(rbuf)
-					qsortf32(gbuf)
-					qsortf32(bbuf)
+					sort(rbuf)
+					sort(gbuf)
+					sort(bbuf)
 					if !opaque {
-						qsortf32(abuf)
+						sort(abuf)
 					}
 
 					idx := sz / 2

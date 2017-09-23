@@ -107,17 +107,28 @@ func maxint(x, y int) int {
 	return y
 }
 
-// in-place quick sort for []float32
-func qsortf32(data []float32) {
-	qsortf32idx(data, 0, len(data)-1)
-}
-func qsortf32idx(data []float32, start, stop int) {
-	if stop-start < 1 {
+func sort(data []float32) {
+	n := len(data)
+
+	if n < 2 {
 		return
 	}
-	i := start
-	j := stop
-	x := data[start+(stop-start)/2]
+
+	if n <= 20 {
+		for i := 1; i < n; i++ {
+			x := data[i]
+			j := i - 1
+			for ; j >= 0 && data[j] > x; j-- {
+				data[j+1] = data[j]
+			}
+			data[j+1] = x
+		}
+		return
+	}
+
+	i := 0
+	j := n - 1
+	x := data[n/2]
 	for i <= j {
 		for data[i] < x {
 			i++
@@ -131,11 +142,11 @@ func qsortf32idx(data []float32, start, stop int) {
 			j--
 		}
 	}
-	if i < stop {
-		qsortf32idx(data, i, stop)
+	if j > 0 {
+		sort(data[:j+1])
 	}
-	if j > start {
-		qsortf32idx(data, start, j)
+	if i < n-1 {
+		sort(data[i:])
 	}
 }
 

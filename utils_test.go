@@ -47,7 +47,7 @@ func TestTempImageCopy(t *testing.T) {
 	copyimage(tmp1, tmp2, nil)
 }
 
-func TestQSort(t *testing.T) {
+func TestSort(t *testing.T) {
 	testData := []struct {
 		a, b []float32
 	}{
@@ -67,13 +67,25 @@ func TestQSort(t *testing.T) {
 			[]float32{-10, 10, -20, 20, -30, 30},
 			[]float32{-30, -20, -10, 10, 20, 30},
 		},
+		{
+			[]float32{
+				0.60, 0.94, 0.66, 0.44, 0.42, 0.69, 0.07, 0.16, 0.10, 0.30,
+				0.52, 0.81, 0.21, 0.38, 0.32, 0.47, 0.28, 0.29, 0.68, 0.22,
+				0.20, 0.36, 0.57, 0.86, 0.29, 0.30, 0.75, 0.21, 0.87, 0.70,
+			},
+			[]float32{
+				0.07, 0.10, 0.16, 0.20, 0.21, 0.21, 0.22, 0.28, 0.29, 0.29,
+				0.30, 0.30, 0.32, 0.36, 0.38, 0.42, 0.44, 0.47, 0.52, 0.57,
+				0.60, 0.66, 0.68, 0.69, 0.70, 0.75, 0.81, 0.86, 0.87, 0.94,
+			},
+		},
 	}
 
 	for _, d := range testData {
-		qsortf32(d.a)
+		sort(d.a)
 		for i := range d.a {
 			if d.a[i] != d.b[i] {
-				t.Errorf("qsort failed: %#v", d.a)
+				t.Errorf("sort failed: %#v", d.a)
 			}
 		}
 	}
