@@ -279,17 +279,17 @@ func interpolateCubic(xf, yf float32, bounds image.Rectangle, pixGetter *pixelGe
 	cfs[15] = k36 * xq * yq * (xq - 1) * (xq + 1) * (yq - 1) * (yq + 1)
 
 	for i := range pxs {
-		wa := pxs[i].A * cfs[i]
-		px.R += pxs[i].R * wa
-		px.G += pxs[i].G * wa
-		px.B += pxs[i].B * wa
-		px.A += wa
+		wa := pxs[i].a * cfs[i]
+		px.r += pxs[i].r * wa
+		px.g += pxs[i].g * wa
+		px.b += pxs[i].b * wa
+		px.a += wa
 	}
 
-	if px.A != 0 {
-		px.R /= px.A
-		px.G /= px.A
-		px.B /= px.A
+	if px.a != 0 {
+		px.r /= px.a
+		px.g /= px.a
+		px.b /= px.a
 	}
 
 	return px
@@ -323,17 +323,17 @@ func interpolateLinear(xf, yf float32, bounds image.Rectangle, pixGetter *pixelG
 	cfs[3] = xq * yq
 
 	for i := range pxs {
-		wa := pxs[i].A * cfs[i]
-		px.R += pxs[i].R * wa
-		px.G += pxs[i].G * wa
-		px.B += pxs[i].B * wa
-		px.A += wa
+		wa := pxs[i].a * cfs[i]
+		px.r += pxs[i].r * wa
+		px.g += pxs[i].g * wa
+		px.b += pxs[i].b * wa
+		px.a += wa
 	}
 
-	if px.A != 0 {
-		px.R /= px.A
-		px.G /= px.A
-		px.B /= px.A
+	if px.a != 0 {
+		px.r /= px.a
+		px.g /= px.a
+		px.b /= px.a
 	}
 
 	return px

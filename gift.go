@@ -156,15 +156,15 @@ func (g *GIFT) DrawAt(dst draw.Image, src image.Image, pt image.Point, op Operat
 				for x := ib.Min.X; x < ib.Max.X; x++ {
 					px0 := pixGetterDst.getPixel(x, y)
 					px1 := pixGetterTmp.getPixel(x, y)
-					c1 := px1.A
-					c0 := (1 - c1) * px0.A
+					c1 := px1.a
+					c0 := (1 - c1) * px0.a
 					cs := c0 + c1
 					c0 /= cs
 					c1 /= cs
-					r := px0.R*c0 + px1.R*c1
-					g := px0.G*c0 + px1.G*c1
-					b := px0.B*c0 + px1.B*c1
-					a := px0.A + px1.A*(1-px0.A)
+					r := px0.r*c0 + px1.r*c1
+					g := px0.g*c0 + px1.g*c1
+					b := px0.b*c0 + px1.b*c1
+					a := px0.a + px1.a*(1-px0.a)
 					pixSetterDst.setPixel(x, y, pixel{r, g, b, a})
 				}
 			}

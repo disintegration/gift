@@ -108,10 +108,10 @@ func resizeLine(dstBuf []pixel, srcBuf []pixel, weights [][]uweight) {
 		var r, g, b, a float32
 		for _, iw := range weights[dstu] {
 			c := srcBuf[iw.u]
-			wa := c.A * iw.weight
-			r += c.R * wa
-			g += c.G * wa
-			b += c.B * wa
+			wa := c.a * iw.weight
+			r += c.r * wa
+			g += c.g * wa
+			b += c.b * wa
 			a += wa
 		}
 		if a != 0 {

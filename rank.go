@@ -117,25 +117,25 @@ func (p *rankFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 
 						px := pxbuf[i*ksize+j]
 						if p.mode == rankMedian {
-							rbuf = append(rbuf, px.R)
-							gbuf = append(gbuf, px.G)
-							bbuf = append(bbuf, px.B)
+							rbuf = append(rbuf, px.r)
+							gbuf = append(gbuf, px.g)
+							bbuf = append(bbuf, px.b)
 							if !opaque {
-								abuf = append(abuf, px.A)
+								abuf = append(abuf, px.a)
 							}
 						} else if p.mode == rankMin {
-							r = minf32(r, px.R)
-							g = minf32(g, px.G)
-							b = minf32(b, px.B)
+							r = minf32(r, px.r)
+							g = minf32(g, px.g)
+							b = minf32(b, px.b)
 							if !opaque {
-								a = minf32(a, px.A)
+								a = minf32(a, px.a)
 							}
 						} else if p.mode == rankMax {
-							r = maxf32(r, px.R)
-							g = maxf32(g, px.G)
-							b = maxf32(b, px.B)
+							r = maxf32(r, px.r)
+							g = maxf32(g, px.g)
+							b = maxf32(b, px.b)
 							if !opaque {
-								a = maxf32(a, px.A)
+								a = maxf32(a, px.a)
 							}
 						}
 						sz++

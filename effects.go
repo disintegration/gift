@@ -54,10 +54,10 @@ func (p *pixelateFilter) Draw(dst draw.Image, src image.Image, options *Options)
 				for y := bbSrc.Min.Y; y < bbSrc.Max.Y; y++ {
 					for x := bbSrc.Min.X; x < bbSrc.Max.X; x++ {
 						px := pixGetter.getPixel(x, y)
-						r += px.R
-						g += px.G
-						b += px.B
-						a += px.A
+						r += px.r
+						g += px.g
+						b += px.b
+						a += px.a
 						cnt++
 					}
 				}

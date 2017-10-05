@@ -125,11 +125,11 @@ func (p *convolutionFilter) Draw(dst draw.Image, src image.Image, options *Optio
 					rowsy := kcenter + w.v
 
 					px := rows[rowsy][rowsx]
-					r += px.R * w.weight
-					g += px.G * w.weight
-					b += px.B * w.weight
+					r += px.r * w.weight
+					g += px.g * w.weight
+					b += px.b * w.weight
 					if p.alpha {
-						a += px.A * w.weight
+						a += px.a * w.weight
 					}
 				}
 				if p.abs {
@@ -149,7 +149,7 @@ func (p *convolutionFilter) Draw(dst draw.Image, src image.Image, options *Optio
 					}
 				}
 				if !p.alpha {
-					a = rows[kcenter][x-srcb.Min.X].A
+					a = rows[kcenter][x-srcb.Min.X].a
 				}
 				pixSetter.setPixel(dstb.Min.X+x-srcb.Min.X, dstb.Min.Y+y-srcb.Min.Y, pixel{r, g, b, a})
 			}
@@ -244,10 +244,10 @@ func convolveLine(dstBuf []pixel, srcBuf []pixel, weights []uweight) {
 				k = max
 			}
 			c := srcBuf[k]
-			wa := c.A * w.weight
-			r += c.R * wa
-			g += c.G * wa
-			b += c.B * wa
+			wa := c.a * w.weight
+			r += c.r * wa
+			g += c.g * wa
+			b += c.b * wa
 			a += wa
 		}
 		if a != 0 {
@@ -424,10 +424,10 @@ func (p *unsharpMaskFilter) Draw(dst draw.Image, src image.Image, options *Optio
 				pxOrig := pixGetterOrig.getPixel(x, y)
 				pxBlur := pixGetterBlur.getPixel(x, y)
 
-				r := unsharp(pxOrig.R, pxBlur.R, p.amount, p.threshold)
-				g := unsharp(pxOrig.G, pxBlur.G, p.amount, p.threshold)
-				b := unsharp(pxOrig.B, pxBlur.B, p.amount, p.threshold)
-				a := unsharp(pxOrig.A, pxBlur.A, p.amount, p.threshold)
+				r := unsharp(pxOrig.r, pxBlur.r, p.amount, p.threshold)
+				g := unsharp(pxOrig.g, pxBlur.g, p.amount, p.threshold)
+				b := unsharp(pxOrig.b, pxBlur.b, p.amount, p.threshold)
+				a := unsharp(pxOrig.a, pxBlur.a, p.amount, p.threshold)
 
 				pixelSetter.setPixel(dstb.Min.X+x-srcb.Min.X, dstb.Min.Y+y-srcb.Min.Y, pixel{r, g, b, a})
 			}
@@ -548,10 +548,10 @@ func (p *hvConvolutionFilter) Draw(dst draw.Image, src image.Image, options *Opt
 			for x := srcb.Min.X; x < srcb.Max.X; x++ {
 				pxh := pixGetterH.getPixel(x, y)
 				pxv := pixGetterV.getPixel(x, y)
-				r := sqrtf32(pxh.R*pxh.R + pxv.R*pxv.R)
-				g := sqrtf32(pxh.G*pxh.G + pxv.G*pxv.G)
-				b := sqrtf32(pxh.B*pxh.B + pxv.B*pxv.B)
-				pixSetter.setPixel(dstb.Min.X+x-srcb.Min.X, dstb.Min.Y+y-srcb.Min.Y, pixel{r, g, b, pxh.A})
+				r := sqrtf32(pxh.r*pxh.r + pxv.r*pxv.r)
+				g := sqrtf32(pxh.g*pxh.g + pxv.g*pxv.g)
+				b := sqrtf32(pxh.b*pxh.b + pxv.b*pxv.b)
+				pixSetter.setPixel(dstb.Min.X+x-srcb.Min.X, dstb.Min.Y+y-srcb.Min.Y, pixel{r, g, b, pxh.a})
 			}
 		}
 	})
