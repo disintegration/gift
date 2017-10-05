@@ -108,8 +108,8 @@ func newPixelGetter(img image.Image) *pixelGetter {
 }
 
 const (
-	qf8  = 1 / 255.0
-	qf16 = 1 / 65535.0
+	qf8  = 1.0 / 0xff
+	qf16 = 1.0 / 0xffff
 	epal = qf16 * qf16 / 2
 )
 
@@ -118,7 +118,7 @@ func pixelFromColor(c color.Color) (px pixel) {
 	switch a16 {
 	case 0:
 		px = pixel{0, 0, 0, 0}
-	case 65535:
+	case 0xffff:
 		r := float32(r16) * qf16
 		g := float32(g16) * qf16
 		b := float32(b16) * qf16
@@ -165,7 +165,7 @@ func getPaletteIndex(pal []pixel, px pixel) int {
 	return k
 }
 
-func (p *pixelGetter) getPixel(x, y int) (px pixel) {
+func (p *pixelGetter) getPixel(x, y int) pixel {
 	switch p.it {
 	case itNRGBA:
 		i := p.nrgba.PixOffset(x, y)
@@ -173,7 +173,7 @@ func (p *pixelGetter) getPixel(x, y int) (px pixel) {
 		g := float32(p.nrgba.Pix[i+1]) * qf8
 		b := float32(p.nrgba.Pix[i+2]) * qf8
 		a := float32(p.nrgba.Pix[i+3]) * qf8
-		px = pixel{r, g, b, a}
+		return pixel{r, g, b, a}
 
 	case itNRGBA64:
 		i := p.nrgba64.PixOffset(x, y)
@@ -181,87 +181,107 @@ func (p *pixelGetter) getPixel(x, y int) (px pixel) {
 		g := float32(uint16(p.nrgba64.Pix[i+2])<<8|uint16(p.nrgba64.Pix[i+3])) * qf16
 		b := float32(uint16(p.nrgba64.Pix[i+4])<<8|uint16(p.nrgba64.Pix[i+5])) * qf16
 		a := float32(uint16(p.nrgba64.Pix[i+6])<<8|uint16(p.nrgba64.Pix[i+7])) * qf16
-		px = pixel{r, g, b, a}
+		return pixel{r, g, b, a}
 
 	case itRGBA:
 		i := p.rgba.PixOffset(x, y)
 		a8 := p.rgba.Pix[i+3]
 		switch a8 {
-		case 0:
-			px = pixel{0, 0, 0, 0}
-		case 255:
+		case 0xff:
 			r := float32(p.rgba.Pix[i+0]) * qf8
 			g := float32(p.rgba.Pix[i+1]) * qf8
 			b := float32(p.rgba.Pix[i+2]) * qf8
-			px = pixel{r, g, b, 1}
+			return pixel{r, g, b, 1}
+		case 0:
+			return pixel{0, 0, 0, 0}
 		default:
 			q := float32(1) / float32(a8)
 			r := float32(p.rgba.Pix[i+0]) * q
 			g := float32(p.rgba.Pix[i+1]) * q
 			b := float32(p.rgba.Pix[i+2]) * q
 			a := float32(a8) * qf8
-			px = pixel{r, g, b, a}
+			return pixel{r, g, b, a}
 		}
 
 	case itRGBA64:
 		i := p.rgba64.PixOffset(x, y)
 		a16 := uint16(p.rgba64.Pix[i+6])<<8 | uint16(p.rgba64.Pix[i+7])
 		switch a16 {
-		case 0:
-			px = pixel{0, 0, 0, 0}
-		case 65535:
+		case 0xffff:
 			r := float32(uint16(p.rgba64.Pix[i+0])<<8|uint16(p.rgba64.Pix[i+1])) * qf16
 			g := float32(uint16(p.rgba64.Pix[i+2])<<8|uint16(p.rgba64.Pix[i+3])) * qf16
 			b := float32(uint16(p.rgba64.Pix[i+4])<<8|uint16(p.rgba64.Pix[i+5])) * qf16
-			px = pixel{r, g, b, 1}
+			return pixel{r, g, b, 1}
+		case 0:
+			return pixel{0, 0, 0, 0}
 		default:
 			q := float32(1) / float32(a16)
 			r := float32(uint16(p.rgba64.Pix[i+0])<<8|uint16(p.rgba64.Pix[i+1])) * q
 			g := float32(uint16(p.rgba64.Pix[i+2])<<8|uint16(p.rgba64.Pix[i+3])) * q
 			b := float32(uint16(p.rgba64.Pix[i+4])<<8|uint16(p.rgba64.Pix[i+5])) * q
 			a := float32(a16) * qf16
-			px = pixel{r, g, b, a}
+			return pixel{r, g, b, a}
 		}
 
 	case itGray:
 		i := p.gray.PixOffset(x, y)
 		v := float32(p.gray.Pix[i]) * qf8
-		px = pixel{v, v, v, 1}
+		return pixel{v, v, v, 1}
 
 	case itGray16:
 		i := p.gray16.PixOffset(x, y)
 		v := float32(uint16(p.gray16.Pix[i+0])<<8|uint16(p.gray16.Pix[i+1])) * qf16
-		px = pixel{v, v, v, 1}
+		return pixel{v, v, v, 1}
 
 	case itYCbCr:
-		iy := p.ycbcr.YOffset(x, y)
-		ic := p.ycbcr.COffset(x, y)
-		r8, g8, b8 := color.YCbCrToRGB(p.ycbcr.Y[iy], p.ycbcr.Cb[ic], p.ycbcr.Cr[ic])
-		r := float32(r8) * qf8
-		g := float32(g8) * qf8
-		b := float32(b8) * qf8
-		px = pixel{r, g, b, 1}
+		iy := (y-p.ycbcr.Rect.Min.Y)*p.ycbcr.YStride + (x - p.ycbcr.Rect.Min.X)
+
+		var ic int
+		switch p.ycbcr.SubsampleRatio {
+		case image.YCbCrSubsampleRatio444:
+			ic = (y-p.ycbcr.Rect.Min.Y)*p.ycbcr.CStride + (x - p.ycbcr.Rect.Min.X)
+		case image.YCbCrSubsampleRatio422:
+			ic = (y-p.ycbcr.Rect.Min.Y)*p.ycbcr.CStride + (x/2 - p.ycbcr.Rect.Min.X/2)
+		case image.YCbCrSubsampleRatio420:
+			ic = (y/2-p.ycbcr.Rect.Min.Y/2)*p.ycbcr.CStride + (x/2 - p.ycbcr.Rect.Min.X/2)
+		case image.YCbCrSubsampleRatio440:
+			ic = (y/2-p.ycbcr.Rect.Min.Y/2)*p.ycbcr.CStride + (x - p.ycbcr.Rect.Min.X)
+		default:
+			ic = p.ycbcr.COffset(x, y)
+		}
+
+		yy := int32(p.ycbcr.Y[iy]) * 0x10101
+		cb := int32(p.ycbcr.Cb[ic]) - 128
+		cr := int32(p.ycbcr.Cr[ic]) - 128
+
+		r16 := (yy + 91881*cr) >> 8
+		g16 := (yy - 22554*cb - 46802*cr) >> 8
+		b16 := (yy + 116130*cb) >> 8
+
+		r := float32(clamp16(r16)) * qf16
+		g := float32(clamp16(g16)) * qf16
+		b := float32(clamp16(b16)) * qf16
+
+		return pixel{r, g, b, 1}
 
 	case itPaletted:
 		i := p.paletted.PixOffset(x, y)
 		k := p.paletted.Pix[i]
-		px = p.palette[k]
-
-	case itGeneric:
-		px = pixelFromColor(p.image.At(x, y))
+		return p.palette[k]
 	}
-	return
+
+	return pixelFromColor(p.image.At(x, y))
 }
 
 func (p *pixelGetter) getPixelRow(y int, buf *[]pixel) {
-	*buf = (*buf)[0:0]
+	*buf = (*buf)[:0]
 	for x := p.bounds.Min.X; x != p.bounds.Max.X; x++ {
 		*buf = append(*buf, p.getPixel(x, y))
 	}
 }
 
 func (p *pixelGetter) getPixelColumn(x int, buf *[]pixel) {
-	*buf = (*buf)[0:0]
+	*buf = (*buf)[:0]
 	for y := p.bounds.Min.Y; y != p.bounds.Max.Y; y++ {
 		*buf = append(*buf, p.getPixel(x, y))
 	}
@@ -269,8 +289,8 @@ func (p *pixelGetter) getPixelColumn(x int, buf *[]pixel) {
 
 func f32u8(val float32) uint8 {
 	x := int64(val + 0.5)
-	if x > 255 {
-		return 255
+	if x > 0xff {
+		return 0xff
 	}
 	if x > 0 {
 		return uint8(x)
@@ -280,11 +300,21 @@ func f32u8(val float32) uint8 {
 
 func f32u16(val float32) uint16 {
 	x := int64(val + 0.5)
-	if x > 65535 {
-		return 65535
+	if x > 0xffff {
+		return 0xffff
 	}
 	if x > 0 {
 		return uint16(x)
+	}
+	return 0
+}
+
+func clamp16(val int32) int32 {
+	if val > 0xffff {
+		return 0xffff
+	}
+	if val > 0 {
+		return val
 	}
 	return 0
 }
@@ -371,16 +401,16 @@ func (p *pixelSetter) setPixel(x, y int, px pixel) {
 	switch p.it {
 	case itNRGBA:
 		i := p.nrgba.PixOffset(x, y)
-		p.nrgba.Pix[i+0] = f32u8(px.R * 255)
-		p.nrgba.Pix[i+1] = f32u8(px.G * 255)
-		p.nrgba.Pix[i+2] = f32u8(px.B * 255)
-		p.nrgba.Pix[i+3] = f32u8(px.A * 255)
+		p.nrgba.Pix[i+0] = f32u8(px.R * 0xff)
+		p.nrgba.Pix[i+1] = f32u8(px.G * 0xff)
+		p.nrgba.Pix[i+2] = f32u8(px.B * 0xff)
+		p.nrgba.Pix[i+3] = f32u8(px.A * 0xff)
 
 	case itNRGBA64:
-		r16 := f32u16(px.R * 65535)
-		g16 := f32u16(px.G * 65535)
-		b16 := f32u16(px.B * 65535)
-		a16 := f32u16(px.A * 65535)
+		r16 := f32u16(px.R * 0xffff)
+		g16 := f32u16(px.G * 0xffff)
+		b16 := f32u16(px.B * 0xffff)
+		a16 := f32u16(px.A * 0xffff)
 		i := p.nrgba64.PixOffset(x, y)
 		p.nrgba64.Pix[i+0] = uint8(r16 >> 8)
 		p.nrgba64.Pix[i+1] = uint8(r16 & 0xff)
@@ -392,7 +422,7 @@ func (p *pixelSetter) setPixel(x, y int, px pixel) {
 		p.nrgba64.Pix[i+7] = uint8(a16 & 0xff)
 
 	case itRGBA:
-		fa := px.A * 255
+		fa := px.A * 0xff
 		i := p.rgba.PixOffset(x, y)
 		p.rgba.Pix[i+0] = f32u8(px.R * fa)
 		p.rgba.Pix[i+1] = f32u8(px.G * fa)
@@ -400,7 +430,7 @@ func (p *pixelSetter) setPixel(x, y int, px pixel) {
 		p.rgba.Pix[i+3] = f32u8(fa)
 
 	case itRGBA64:
-		fa := px.A * 65535
+		fa := px.A * 0xffff
 		r16 := f32u16(px.R * fa)
 		g16 := f32u16(px.G * fa)
 		b16 := f32u16(px.B * fa)
@@ -417,11 +447,11 @@ func (p *pixelSetter) setPixel(x, y int, px pixel) {
 
 	case itGray:
 		i := p.gray.PixOffset(x, y)
-		p.gray.Pix[i] = f32u8((0.299*px.R + 0.587*px.G + 0.114*px.B) * px.A * 255)
+		p.gray.Pix[i] = f32u8((0.299*px.R + 0.587*px.G + 0.114*px.B) * px.A * 0xff)
 
 	case itGray16:
 		i := p.gray16.PixOffset(x, y)
-		y16 := f32u16((0.299*px.R + 0.587*px.G + 0.114*px.B) * px.A * 65535)
+		y16 := f32u16((0.299*px.R + 0.587*px.G + 0.114*px.B) * px.A * 0xffff)
 		p.gray16.Pix[i+0] = uint8(y16 >> 8)
 		p.gray16.Pix[i+1] = uint8(y16 & 0xff)
 
@@ -437,10 +467,10 @@ func (p *pixelSetter) setPixel(x, y int, px pixel) {
 		p.paletted.Pix[i] = uint8(k)
 
 	case itGeneric:
-		r16 := f32u16(px.R * 65535)
-		g16 := f32u16(px.G * 65535)
-		b16 := f32u16(px.B * 65535)
-		a16 := f32u16(px.A * 65535)
+		r16 := f32u16(px.R * 0xffff)
+		g16 := f32u16(px.G * 0xffff)
+		b16 := f32u16(px.B * 0xffff)
+		a16 := f32u16(px.A * 0xffff)
 		p.image.Set(x, y, color.NRGBA64{r16, g16, b16, a16})
 	}
 }
