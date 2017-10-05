@@ -466,6 +466,21 @@ func ColorBalance(percentageRed, percentageGreen, percentageBlue float32) Filter
 	}
 }
 
+// Threshold creates a filter that applies black/white thresholding to the image.
+// The percentage parameter must be in range (0, 100).
+func Threshold(percentage float32) Filter {
+	p := minf32(maxf32(percentage, 0), 100) / 100
+	return &colorFilter{
+		fn: func(px pixel) pixel {
+			y := 0.299*px.r + 0.587*px.g + 0.114*px.b
+			if y > p {
+				return pixel{1, 1, 1, px.a}
+			}
+			return pixel{0, 0, 0, px.a}
+		},
+	}
+}
+
 // ColorFunc creates a filter that changes the colors of an image using custom function.
 // The fn parameter specifies a function that takes red, green, blue and alpha channels of a pixel
 // as float32 values in range (0, 1) and returns the modified channel values.

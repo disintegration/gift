@@ -125,6 +125,7 @@ gift.New().DrawAt(dstImage, fgImage, image.Pt(100, 100), gift.OverOperator)
     - Sepia(percentage float32)
     - Sigmoid(midpoint, factor float32)
     - Sobel()
+    - Threshold(percentage float32)
     - UnsharpMask(sigma, amount, threshold float32)
 
 
