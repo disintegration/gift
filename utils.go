@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 )
 
-// parallelize data processing if 'enabled' is true
+// parallelize parallelizes the data processing if enabled is true.
 func parallelize(enabled bool, datamin, datamax int, fn func(pmin, pmax int)) {
 	datasize := datamax - datamin
 	partsize := datasize
@@ -54,52 +54,59 @@ func parallelize(enabled bool, datamin, datamax int, fn func(pmin, pmax int)) {
 	}
 }
 
-// float32 math
 func absf32(x float32) float32 {
 	if x < 0 {
 		return -x
 	}
 	return x
 }
+
 func minf32(x, y float32) float32 {
 	if x < y {
 		return x
 	}
 	return y
 }
+
 func maxf32(x, y float32) float32 {
 	if x > y {
 		return x
 	}
 	return y
 }
+
 func powf32(x, y float32) float32 {
 	return float32(math.Pow(float64(x), float64(y)))
 }
+
 func logf32(x float32) float32 {
 	return float32(math.Log(float64(x)))
 }
+
 func expf32(x float32) float32 {
 	return float32(math.Exp(float64(x)))
 }
+
 func sincosf32(a float32) (float32, float32) {
 	sin, cos := math.Sincos(math.Pi * float64(a) / 180)
 	return float32(sin), float32(cos)
 }
+
 func floorf32(x float32) float32 {
 	return float32(math.Floor(float64(x)))
 }
+
 func sqrtf32(x float32) float32 {
 	return float32(math.Sqrt(float64(x)))
 }
 
-// int math
 func minint(x, y int) int {
 	if x < y {
 		return x
 	}
 	return y
 }
+
 func maxint(x, y int) int {
 	if x > y {
 		return x
@@ -150,23 +157,23 @@ func sort(data []float32) {
 	}
 }
 
-// useful types for precomputing pixel weights
 type uweight struct {
 	u      int
 	weight float32
 }
+
 type uvweight struct {
 	u      int
 	v      int
 	weight float32
 }
 
-// create default temp image
+// createTempImage creates a temporary image.
 func createTempImage(r image.Rectangle) draw.Image {
-	return image.NewNRGBA64(r) // use 16 bits per channel images internally
+	return image.NewNRGBA64(r)
 }
 
-// check if image is opaque
+// isOpaque checks if the given image is opaque.
 func isOpaque(img image.Image) bool {
 	switch img := img.(type) {
 	case *image.NRGBA:
@@ -189,7 +196,7 @@ func isOpaque(img image.Image) bool {
 	return false
 }
 
-// generate disk-shaped kernel
+// genDisk generates a disk-shaped kernel.
 func genDisk(ksize int) []float32 {
 	if ksize%2 == 0 {
 		ksize--
@@ -212,7 +219,7 @@ func genDisk(ksize int) []float32 {
 	return disk
 }
 
-// copy image from src to dst
+// copyimage copies an image from src to dst.
 func copyimage(dst draw.Image, src image.Image, options *Options) {
 	if options == nil {
 		options = &defaultOptions
