@@ -19,7 +19,7 @@ func parallelize(enabled bool, datamin, datamax int, fn func(pmin, pmax int)) {
 		numProcs := runtime.GOMAXPROCS(0)
 		if numProcs > 1 {
 			numGoroutines = numProcs
-			partsize = partsize / (numGoroutines * 10)
+			partsize = partsize / numGoroutines
 			if partsize < 1 {
 				partsize = 1
 			}
