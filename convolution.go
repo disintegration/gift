@@ -6,6 +6,17 @@ import (
 	"math"
 )
 
+type uweight struct {
+	u      int
+	weight float32
+}
+
+type uvweight struct {
+	u      int
+	v      int
+	weight float32
+}
+
 func prepareConvolutionWeights(kernel []float32, normalize bool) (int, []uvweight) {
 	size := int(math.Sqrt(float64(len(kernel))))
 	if size%2 == 0 {

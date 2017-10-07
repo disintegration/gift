@@ -157,17 +157,6 @@ func sort(data []float32) {
 	}
 }
 
-type uweight struct {
-	u      int
-	weight float32
-}
-
-type uvweight struct {
-	u      int
-	v      int
-	weight float32
-}
-
 // createTempImage creates a temporary image.
 func createTempImage(r image.Rectangle) draw.Image {
 	return image.NewNRGBA64(r)

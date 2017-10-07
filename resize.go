@@ -65,54 +65,62 @@ var CubicResampling Resampling
 // LanczosResampling is a Lanczos resampling filter (3 lobes).
 var LanczosResampling Resampling
 
-func precomputeResamplingWeights(dstSize, srcSize int, resampling Resampling) [][]uweight {
-	du := float32(srcSize) / float32(dstSize)
-	scale := du
+type resampWeight struct {
+	index  int
+	weight float32
+}
+
+func prepareResampWeights(dstSize, srcSize int, resampling Resampling) [][]resampWeight {
+	delta := float32(srcSize) / float32(dstSize)
+	scale := delta
 	if scale < 1 {
 		scale = 1
 	}
-	ru := float32(math.Ceil(float64(scale * resampling.Support())))
+	radius := float32(math.Ceil(float64(scale * resampling.Support())))
 
-	tmp := make([]float32, int(ru+2)*2)
-	result := make([][]uweight, dstSize)
+	result := make([][]resampWeight, dstSize)
 
-	for v := 0; v < dstSize; v++ {
-		fu := (float32(v)+0.5)*du - 0.5
+	for i := 0; i < dstSize; i++ {
+		center := (float32(i)+0.5)*delta - 0.5
 
-		startu := int(math.Ceil(float64(fu - ru)))
-		if startu < 0 {
-			startu = 0
+		left := int(math.Ceil(float64(center - radius)))
+		if left < 0 {
+			left = 0
 		}
-		endu := int(math.Floor(float64(fu + ru)))
-		if endu > srcSize-1 {
-			endu = srcSize - 1
+		right := int(math.Floor(float64(center + radius)))
+		if right > srcSize-1 {
+			right = srcSize - 1
 		}
+
+		result[i] = make([]resampWeight, 0, right-left+1)
 
 		var sum float32
-		for u := startu; u <= endu; u++ {
-			w := resampling.Kernel((float32(u) - fu) / scale)
-			sum += w
-			tmp[u-startu] = w
+		for j := left; j <= right; j++ {
+			weight := resampling.Kernel((float32(j) - center) / scale)
+			if weight == 0 {
+				continue
+			}
+			result[i] = append(result[i], resampWeight{
+				index:  j,
+				weight: weight,
+			})
+			sum += weight
 		}
 
-		result[v] = make([]uweight, 0, endu-startu+1)
-		for u := startu; u <= endu; u++ {
-			w := tmp[u-startu] / sum
-			if w != 0 {
-				result[v] = append(result[v], uweight{u, w})
-			}
+		for j := range result[i] {
+			result[i][j].weight /= sum
 		}
 	}
 
 	return result
 }
 
-func resizeLine(dstBuf []pixel, srcBuf []pixel, weights [][]uweight) {
-	for dstu := 0; dstu < len(weights); dstu++ {
+func resizeLine(dst []pixel, src []pixel, weights [][]resampWeight) {
+	for i := 0; i < len(dst); i++ {
 		var r, g, b, a float32
-		for _, iw := range weights[dstu] {
-			c := srcBuf[iw.u]
-			wa := c.a * iw.weight
+		for _, w := range weights[i] {
+			c := src[w.index]
+			wa := c.a * w.weight
 			r += c.r * wa
 			g += c.g * wa
 			b += c.b * wa
@@ -123,7 +131,7 @@ func resizeLine(dstBuf []pixel, srcBuf []pixel, weights [][]uweight) {
 			g /= a
 			b /= a
 		}
-		dstBuf[dstu] = pixel{r, g, b, a}
+		dst[i] = pixel{r, g, b, a}
 	}
 }
 
@@ -131,7 +139,7 @@ func resizeHorizontal(dst draw.Image, src image.Image, w int, resampling Resampl
 	srcb := src.Bounds()
 	dstb := dst.Bounds()
 
-	weights := precomputeResamplingWeights(w, srcb.Dx(), resampling)
+	weights := prepareResampWeights(w, srcb.Dx(), resampling)
 
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
@@ -151,7 +159,7 @@ func resizeVertical(dst draw.Image, src image.Image, h int, resampling Resamplin
 	srcb := src.Bounds()
 	dstb := dst.Bounds()
 
-	weights := precomputeResamplingWeights(h, srcb.Dy(), resampling)
+	weights := prepareResampWeights(h, srcb.Dy(), resampling)
 
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
