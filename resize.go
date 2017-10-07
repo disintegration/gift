@@ -79,6 +79,7 @@ func prepareResampWeights(dstSize, srcSize int, resampling Resampling) [][]resam
 	radius := float32(math.Ceil(float64(scale * resampling.Support())))
 
 	result := make([][]resampWeight, dstSize)
+	tmp := make([]resampWeight, 0, dstSize*int(radius+2)*2)
 
 	for i := 0; i < dstSize; i++ {
 		center := (float32(i)+0.5)*delta - 0.5
@@ -92,24 +93,25 @@ func prepareResampWeights(dstSize, srcSize int, resampling Resampling) [][]resam
 			right = srcSize - 1
 		}
 
-		result[i] = make([]resampWeight, 0, right-left+1)
-
 		var sum float32
 		for j := left; j <= right; j++ {
 			weight := resampling.Kernel((float32(j) - center) / scale)
 			if weight == 0 {
 				continue
 			}
-			result[i] = append(result[i], resampWeight{
+			tmp = append(tmp, resampWeight{
 				index:  j,
 				weight: weight,
 			})
 			sum += weight
 		}
 
-		for j := range result[i] {
-			result[i][j].weight /= sum
+		for j := range tmp {
+			tmp[j].weight /= sum
 		}
+
+		result[i] = tmp
+		tmp = tmp[len(tmp):]
 	}
 
 	return result
