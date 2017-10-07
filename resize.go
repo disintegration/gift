@@ -77,26 +77,30 @@ func precomputeResamplingWeights(dstSize, srcSize int, resampling Resampling) []
 	result := make([][]uweight, dstSize)
 
 	for v := 0; v < dstSize; v++ {
-		fU := (float32(v)+0.5)*du - 0.5
+		fu := (float32(v)+0.5)*du - 0.5
 
-		startu := int(math.Ceil(float64(fU - ru)))
+		startu := int(math.Ceil(float64(fu - ru)))
 		if startu < 0 {
 			startu = 0
 		}
-		endu := int(math.Floor(float64(fU + ru)))
+		endu := int(math.Floor(float64(fu + ru)))
 		if endu > srcSize-1 {
 			endu = srcSize - 1
 		}
 
-		sumf := float32(0)
+		var sum float32
 		for u := startu; u <= endu; u++ {
-			w := resampling.Kernel((float32(u) - fU) / scale)
-			sumf += w
+			w := resampling.Kernel((float32(u) - fu) / scale)
+			sum += w
 			tmp[u-startu] = w
 		}
+
+		result[v] = make([]uweight, 0, endu-startu+1)
 		for u := startu; u <= endu; u++ {
-			w := tmp[u-startu] / sumf
-			result[v] = append(result[v], uweight{u, w})
+			w := tmp[u-startu] / sum
+			if w != 0 {
+				result[v] = append(result[v], uweight{u, w})
+			}
 		}
 	}
 
