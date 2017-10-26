@@ -2,7 +2,6 @@ package gift
 
 import (
 	"image"
-	"image/draw"
 	"math/rand"
 	"testing"
 )
@@ -499,10 +498,7 @@ func genTestImageMedian(w, h int) image.Image {
 	return img
 }
 
-var (
-	srcImageMedian = genTestImageMedian(100, 100)
-	dstImageMedian draw.Image
-)
+var srcImageMedian = genTestImageMedian(100, 100)
 
 func benchmarkMedianSize(b *testing.B, ksize int) {
 	g := New(Median(ksize, false))

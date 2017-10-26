@@ -229,8 +229,6 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 			}
 		}
 	})
-
-	return
 }
 
 func interpolateCubic(xf, yf float32, bounds image.Rectangle, pixGetter *pixelGetter, bgpx pixel) pixel {

@@ -262,7 +262,6 @@ func (p *resizeFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 	tmp := createTempImage(image.Rect(0, 0, w, src.Bounds().Dy()))
 	resizeHorizontal(tmp, src, w, p.resampling, options)
 	resizeVertical(dst, tmp, h, p.resampling, options)
-	return
 }
 
 // Resize creates a filter that resizes an image to the specified width and height using the specified resampling.
@@ -322,7 +321,6 @@ func (p *resizeToFitFilter) Bounds(srcBounds image.Rectangle) image.Rectangle {
 func (p *resizeToFitFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 	b := p.Bounds(src.Bounds())
 	Resize(b.Dx(), b.Dy(), p.resampling).Draw(dst, src, options)
-	return
 }
 
 // ResizeToFit creates a filter that resizes an image to fit within the specified dimensions while preserving the aspect ratio.
@@ -378,8 +376,6 @@ func (p *resizeToFillFilter) Draw(dst draw.Image, src image.Image, options *Opti
 	tmp := createTempImage(image.Rect(0, 0, tmpw, tmph))
 	Resize(tmpw, tmph, p.resampling).Draw(tmp, src, options)
 	CropToSize(w, h, p.anchor).Draw(dst, tmp, options)
-
-	return
 }
 
 // ResizeToFill creates a filter that resizes an image to the smallest possible size that will cover the specified dimensions,

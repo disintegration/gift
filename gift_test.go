@@ -21,7 +21,6 @@ func (p *testFilter) Bounds(srcBounds image.Rectangle) (dstBounds image.Rectangl
 
 func (p *testFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 	dst.Set(dst.Bounds().Min.X, dst.Bounds().Min.Y, color.Gray{123})
-	return
 }
 
 func TestGIFT(t *testing.T) {
