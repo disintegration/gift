@@ -328,7 +328,7 @@ func TestF32u16(t *testing.T) {
 	}
 }
 
-func TestClamp16(t *testing.T) {
+func TestClampi32(t *testing.T) {
 	testData := []struct {
 		x int32
 		y int32
@@ -336,14 +336,14 @@ func TestClamp16(t *testing.T) {
 		{-1, 0},
 		{0, 0},
 		{1, 1},
-		{10000, 10000},
-		{65535, 65535},
-		{65536, 65535},
+		{99, 99},
+		{100, 100},
+		{101, 100},
 	}
 	for _, p := range testData {
-		v := clamp16(p.x)
+		v := clampi32(p.x, 0, 100)
 		if v != p.y {
-			t.Errorf("clamp16(%d) != %d: %d", p.x, p.y, v)
+			t.Errorf("clampi32(%d) != %d: %d", p.x, p.y, v)
 		}
 	}
 }

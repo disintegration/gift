@@ -250,17 +250,22 @@ func (p *pixelGetter) getPixel(x, y int) pixel {
 			ic = p.ycbcr.COffset(x, y)
 		}
 
-		yy := int32(p.ycbcr.Y[iy]) * 0x10101
-		cb := int32(p.ycbcr.Cb[ic]) - 128
-		cr := int32(p.ycbcr.Cr[ic]) - 128
+		const (
+			max = 255 * 1e5
+			inv = 1.0 / max
+		)
 
-		r16 := (yy + 91881*cr) >> 8
-		g16 := (yy - 22554*cb - 46802*cr) >> 8
-		b16 := (yy + 116130*cb) >> 8
+		y1 := int32(p.ycbcr.Y[iy]) * 1e5
+		cb1 := int32(p.ycbcr.Cb[ic]) - 128
+		cr1 := int32(p.ycbcr.Cr[ic]) - 128
 
-		r := float32(clamp16(r16)) * qf16
-		g := float32(clamp16(g16)) * qf16
-		b := float32(clamp16(b16)) * qf16
+		r1 := y1 + 140200*cr1
+		g1 := y1 - 34414*cb1 - 71414*cr1
+		b1 := y1 + 177200*cb1
+
+		r := float32(clampi32(r1, 0, max)) * inv
+		g := float32(clampi32(g1, 0, max)) * inv
+		b := float32(clampi32(b1, 0, max)) * inv
 
 		return pixel{r, g, b, 1}
 
@@ -309,11 +314,11 @@ func f32u16(val float32) uint16 {
 	return 0
 }
 
-func clamp16(val int32) int32 {
-	if val > 0xffff {
-		return 0xffff
+func clampi32(val, min, max int32) int32 {
+	if val > max {
+		return max
 	}
-	if val > 0 {
+	if val > min {
 		return val
 	}
 	return 0
