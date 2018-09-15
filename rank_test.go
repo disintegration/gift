@@ -2,7 +2,6 @@ package gift
 
 import (
 	"image"
-	"math/rand"
 	"testing"
 )
 
@@ -483,30 +482,3 @@ func TestMaximum(t *testing.T) {
 		}
 	}
 }
-
-func genTestImageMedian(w, h int) image.Image {
-	img := image.NewNRGBA(image.Rect(0, 0, w, h))
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
-			i := img.PixOffset(x, y)
-			img.Pix[i+0] = uint8(rand.Intn(256))
-			img.Pix[i+1] = uint8(rand.Intn(256))
-			img.Pix[i+2] = uint8(rand.Intn(256))
-			img.Pix[i+3] = uint8(rand.Intn(256))
-		}
-	}
-	return img
-}
-
-var srcImageMedian = genTestImageMedian(100, 100)
-
-func benchmarkMedianSize(b *testing.B, ksize int) {
-	g := New(Median(ksize, false))
-	dst := image.NewNRGBA(g.Bounds(srcImageMedian.Bounds()))
-	for i := 0; i < b.N; i++ {
-		g.Draw(dst, srcImageMedian)
-	}
-}
-
-func BenchmarkMedian3(b *testing.B) { benchmarkMedianSize(b, 3) }
-func BenchmarkMedian9(b *testing.B) { benchmarkMedianSize(b, 9) }

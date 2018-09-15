@@ -4,6 +4,7 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
+	_ "image/jpeg"
 	_ "image/png"
 	"os"
 	"reflect"
@@ -591,5 +592,86 @@ func TestGolden(t *testing.T) {
 		if !reflect.DeepEqual(dst, want) {
 			t.Errorf("resulting image differs from golden: %s", name)
 		}
+	}
+}
+
+func BenchmarkFilter(b *testing.B) {
+	file, err := os.Open("testdata/src.jpg")
+	if err != nil {
+		b.Fatalf("failed to open test image: %v", err)
+	}
+	src, _, err := image.Decode(file)
+	if err != nil {
+		b.Fatalf("failed to decode test image: %v", err)
+	}
+	filters := []struct {
+		name   string
+		filter Filter
+	}{
+		{"Resize Lanczos", Resize(150, 0, LanczosResampling)},
+		{"Resize Cubic", Resize(150, 0, CubicResampling)},
+		{"Resize Linear", Resize(150, 0, LinearResampling)},
+		{"Resize Box", Resize(150, 0, BoxResampling)},
+		{"Resize Nearest", Resize(150, 0, NearestNeighborResampling)},
+		{"Crop", Crop(image.Rect(50, 50, 200, 200))},
+		{"CropToSize", CropToSize(150, 150, CenterAnchor)},
+		{"FlipHorizontal", FlipHorizontal()},
+		{"FlipVertical", FlipVertical()},
+		{"Transpose", Transpose()},
+		{"Transverse", Transverse()},
+		{"Rotate90", Rotate90()},
+		{"Rotate180", Rotate180()},
+		{"Rotate270", Rotate270()},
+		{"Rotate", Rotate(30, color.Transparent, CubicInterpolation)},
+		{"Brightness", Brightness(30)},
+		{"Contrast", Contrast(30)},
+		{"Saturation", Saturation(50)},
+		{"Gamma", Gamma(1.5)},
+		{"GaussianBlur", GaussianBlur(1)},
+		{"UnsharpMask", UnsharpMask(1, 1, 0)},
+		{"Sigmoid", Sigmoid(0.5, 7)},
+		{"Pixelate", Pixelate(5)},
+		{"Colorize", Colorize(240, 50, 100)},
+		{"ColorBalance", ColorBalance(10, -10, -10)},
+		{"Threshold", Threshold(50)},
+		{"Hue", Hue(45)},
+		{"Grayscale", Grayscale()},
+		{"Sepia", Sepia(100)},
+		{"Invert", Invert()},
+		{"ColorFunc", ColorFunc(
+			func(r0, g0, b0, a0 float32) (r, g, b, a float32) {
+				r = 1 - r0
+				g = g0 + 0.1
+				b = 0
+				a = a0
+				return
+			},
+		)},
+		{"ColorspaceSRGBToLinear", ColorspaceSRGBToLinear()},
+		{"ColorspaceLinearToSRGB", ColorspaceLinearToSRGB()},
+		{"Mean", Mean(5, true)},
+		{"Median", Median(5, true)},
+		{"Minimum", Minimum(5, true)},
+		{"Maximum", Maximum(5, true)},
+		{"Convolution", Convolution(
+			[]float32{
+				-1, -1, 0,
+				-1, 1, 1,
+				0, 1, 1,
+			},
+			false, false, false, 0,
+		)},
+		{"Sobel", Sobel()},
+	}
+	for _, f := range filters {
+		b.Run(f.name, func(b *testing.B) {
+			g := New(f.filter)
+			dst := image.NewNRGBA(g.Bounds(src.Bounds()))
+			b.ReportAllocs()
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				g.Draw(dst, src)
+			}
+		})
 	}
 }
