@@ -160,23 +160,11 @@ func createTempImage(r image.Rectangle) draw.Image {
 
 // isOpaque checks if the given image is opaque.
 func isOpaque(img image.Image) bool {
-	switch img := img.(type) {
-	case *image.NRGBA:
-		return img.Opaque()
-	case *image.NRGBA64:
-		return img.Opaque()
-	case *image.RGBA:
-		return img.Opaque()
-	case *image.RGBA64:
-		return img.Opaque()
-	case *image.Gray:
-		return true
-	case *image.Gray16:
-		return true
-	case *image.YCbCr:
-		return true
-	case *image.Paletted:
-		return img.Opaque()
+	type opaquer interface {
+		Opaque() bool
+	}
+	if o, ok := img.(opaquer); ok {
+		return o.Opaque()
 	}
 	return false
 }

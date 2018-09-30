@@ -208,6 +208,18 @@ func TestDisk(t *testing.T) {
 	}
 }
 
+type customImage struct{}
+
+func (customImage) ColorModel() color.Model {
+	return color.GrayModel
+}
+func (customImage) Bounds() image.Rectangle {
+	return image.Rectangle{}
+}
+func (customImage) At(x, y int) color.Color {
+	return color.Gray{}
+}
+
 func TestIsOpaque(t *testing.T) {
 	type opqt struct {
 		img    image.Image
@@ -215,6 +227,7 @@ func TestIsOpaque(t *testing.T) {
 	}
 	var testData []opqt
 
+	testData = append(testData, opqt{customImage{}, false})
 	testData = append(testData, opqt{image.NewNRGBA(image.Rect(0, 0, 1, 1)), false})
 	testData = append(testData, opqt{image.NewNRGBA64(image.Rect(0, 0, 1, 1)), false})
 	testData = append(testData, opqt{image.NewRGBA(image.Rect(0, 0, 1, 1)), false})
