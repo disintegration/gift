@@ -151,8 +151,8 @@ func (g *GIFT) DrawAt(dst draw.Image, src image.Image, pt image.Point, op Operat
 		pixGetterTmp := newPixelGetter(tmp)
 		pixSetterDst := newPixelSetter(dst)
 		ib := tb.Intersect(dst.Bounds())
-		parallelize(g.Options.Parallelization, ib.Min.Y, ib.Max.Y, func(pmin, pmax int) {
-			for y := pmin; y < pmax; y++ {
+		parallelize(g.Options.Parallelization, ib.Min.Y, ib.Max.Y, func(start, stop int) {
+			for y := start; y < stop; y++ {
 				for x := ib.Min.X; x < ib.Max.X; x++ {
 					px0 := pixGetterDst.getPixel(x, y)
 					px1 := pixGetterTmp.getPixel(x, y)
@@ -186,8 +186,8 @@ func (g *GIFT) DrawAt(dst draw.Image, src image.Image, pt image.Point, op Operat
 		pixGetter := newPixelGetter(tmp)
 		pixSetter := newPixelSetter(dst)
 		ib := tb.Intersect(dst.Bounds())
-		parallelize(g.Options.Parallelization, ib.Min.Y, ib.Max.Y, func(pmin, pmax int) {
-			for y := pmin; y < pmax; y++ {
+		parallelize(g.Options.Parallelization, ib.Min.Y, ib.Max.Y, func(start, stop int) {
+			for y := start; y < stop; y++ {
 				for x := ib.Min.X; x < ib.Max.X; x++ {
 					pixSetter.setPixel(x, y, pixGetter.getPixel(x, y))
 				}

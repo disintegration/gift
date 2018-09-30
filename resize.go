@@ -146,10 +146,10 @@ func resizeHorizontal(dst draw.Image, src image.Image, w int, resampling Resampl
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(start, stop int) {
 		srcBuf := make([]pixel, srcb.Dx())
 		dstBuf := make([]pixel, w)
-		for srcy := pmin; srcy < pmax; srcy++ {
+		for srcy := start; srcy < stop; srcy++ {
 			pixGetter.getPixelRow(srcy, &srcBuf)
 			resizeLine(dstBuf, srcBuf, weights)
 			pixSetter.setPixelRow(dstb.Min.Y+srcy-srcb.Min.Y, dstBuf)
@@ -166,10 +166,10 @@ func resizeVertical(dst draw.Image, src image.Image, h int, resampling Resamplin
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, srcb.Min.X, srcb.Max.X, func(pmin, pmax int) {
+	parallelize(options.Parallelization, srcb.Min.X, srcb.Max.X, func(start, stop int) {
 		srcBuf := make([]pixel, srcb.Dy())
 		dstBuf := make([]pixel, h)
-		for srcx := pmin; srcx < pmax; srcx++ {
+		for srcx := start; srcx < stop; srcx++ {
 			pixGetter.getPixelColumn(srcx, &srcBuf)
 			resizeLine(dstBuf, srcBuf, weights)
 			pixSetter.setPixelColumn(dstb.Min.X+srcx-srcb.Min.X, dstBuf)
@@ -186,8 +186,8 @@ func resizeNearest(dst draw.Image, src image.Image, w, h int, options *Options) 
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, dstb.Min.Y, dstb.Min.Y+h, func(pmin, pmax int) {
-		for dsty := pmin; dsty < pmax; dsty++ {
+	parallelize(options.Parallelization, dstb.Min.Y, dstb.Min.Y+h, func(start, stop int) {
+		for dsty := start; dsty < stop; dsty++ {
 			for dstx := dstb.Min.X; dstx < dstb.Min.X+w; dstx++ {
 				fx := math.Floor((float64(dstx-dstb.Min.X) + 0.5) * dx)
 				fy := math.Floor((float64(dsty-dstb.Min.Y) + 0.5) * dy)

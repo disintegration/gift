@@ -42,8 +42,8 @@ func (p *transformFilter) Draw(dst draw.Image, src image.Image, options *Options
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
-		for srcy := pmin; srcy < pmax; srcy++ {
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(start, stop int) {
+		for srcy := start; srcy < stop; srcy++ {
 			for srcx := srcb.Min.X; srcx < srcb.Max.X; srcx++ {
 				var dstx, dsty int
 				switch p.tt {
@@ -208,8 +208,8 @@ func (p *rotateFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, 0, h, func(pmin, pmax int) {
-		for y := pmin; y < pmax; y++ {
+	parallelize(options.Parallelization, 0, h, func(start, stop int) {
+		for y := start; y < stop; y++ {
 			for x := 0; x < w; x++ {
 
 				xf, yf := rotatePoint(float32(x)-dstxoff, float32(y)-dstyoff, asin, acos)
@@ -386,8 +386,8 @@ func (p *cropFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
-		for srcy := pmin; srcy < pmax; srcy++ {
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(start, stop int) {
+		for srcy := start; srcy < stop; srcy++ {
 			for srcx := srcb.Min.X; srcx < srcb.Max.X; srcx++ {
 				dstx := dstb.Min.X + srcx - srcb.Min.X
 				dsty := dstb.Min.Y + srcy - srcb.Min.Y

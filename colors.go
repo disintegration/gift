@@ -62,8 +62,8 @@ func (p *colorchanFilter) Draw(dst draw.Image, src image.Image, options *Options
 		}
 	}
 
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
-		for y := pmin; y < pmax; y++ {
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(start, stop int) {
+		for y := start; y < stop; y++ {
 			for x := srcb.Min.X; x < srcb.Max.X; x++ {
 				px := pixGetter.getPixel(x, y)
 				if useLut {
@@ -235,8 +235,8 @@ func (p *colorFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
-		for y := pmin; y < pmax; y++ {
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(start, stop int) {
+		for y := start; y < stop; y++ {
 			for x := srcb.Min.X; x < srcb.Max.X; x++ {
 				px := pixGetter.getPixel(x, y)
 				pixSetter.setPixel(dstb.Min.X+x-srcb.Min.X, dstb.Min.Y+y-srcb.Min.Y, p.fn(px))

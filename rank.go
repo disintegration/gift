@@ -57,7 +57,7 @@ func (p *rankFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(start, stop int) {
 		pxbuf := []pixel{}
 
 		var rbuf, gbuf, bbuf, abuf []float32
@@ -70,7 +70,7 @@ func (p *rankFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 			}
 		}
 
-		for y := pmin; y < pmax; y++ {
+		for y := start; y < stop; y++ {
 			// init buffer
 			pxbuf = pxbuf[:0]
 			for i := srcb.Min.X - kradius; i <= srcb.Min.X+kradius; i++ {

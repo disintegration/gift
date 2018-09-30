@@ -6,51 +6,47 @@ import (
 	"math"
 	"runtime"
 	"sync"
-	"sync/atomic"
 )
 
-// parallelize parallelizes the data processing if enabled is true.
-func parallelize(enabled bool, datamin, datamax int, fn func(pmin, pmax int)) {
-	datasize := datamax - datamin
-	partsize := datasize
-
-	numGoroutines := 1
+// parallelize parallelizes the data processing.
+func parallelize(enabled bool, start, stop int, fn func(start, stop int)) {
+	procs := 1
 	if enabled {
-		numProcs := runtime.GOMAXPROCS(0)
-		if numProcs > 1 {
-			numGoroutines = numProcs
-			partsize = partsize / numGoroutines
-			if partsize < 1 {
-				partsize = 1
-			}
-		}
+		procs = runtime.GOMAXPROCS(0)
+	}
+	var wg sync.WaitGroup
+	splitRange(start, stop, procs, func(pstart, pstop int) {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			fn(pstart, pstop)
+		}()
+	})
+	wg.Wait()
+}
+
+// splitRange splits a range into n parts and calls a function for each of them.
+func splitRange(start, stop, n int, fn func(pstart, pstop int)) {
+	count := stop - start
+	if count < 1 {
+		return
 	}
 
-	if numGoroutines == 1 {
-		fn(datamin, datamax)
-	} else {
-		var wg sync.WaitGroup
-		wg.Add(numGoroutines)
-		idx := int64(datamin)
+	if n < 1 {
+		n = 1
+	}
+	if n > count {
+		n = count
+	}
 
-		for p := 0; p < numGoroutines; p++ {
-			go func() {
-				defer wg.Done()
-				for {
-					pmin := int(atomic.AddInt64(&idx, int64(partsize))) - partsize
-					if pmin >= datamax {
-						break
-					}
-					pmax := pmin + partsize
-					if pmax > datamax {
-						pmax = datamax
-					}
-					fn(pmin, pmax)
-				}
-			}()
-		}
+	div := count / n
+	mod := count % n
 
-		wg.Wait()
+	for i := 0; i < n; i++ {
+		fn(
+			start+i*div+minint(i, mod),
+			start+(i+1)*div+minint(i+1, mod),
+		)
 	}
 }
 
@@ -219,8 +215,8 @@ func copyimage(dst draw.Image, src image.Image, options *Options) {
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
-		for srcy := pmin; srcy < pmax; srcy++ {
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(start, stop int) {
+		for srcy := start; srcy < stop; srcy++ {
 			for srcx := srcb.Min.X; srcx < srcb.Max.X; srcx++ {
 				dstx := dstb.Min.X + srcx - srcb.Min.X
 				dsty := dstb.Min.Y + srcy - srcb.Min.Y

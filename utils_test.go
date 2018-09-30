@@ -7,28 +7,64 @@ import (
 	"testing"
 )
 
+func TestParallelize(t *testing.T) {
+	for _, e := range []bool{true, false} {
+		for _, n := range []int{0, 1, 5, 10, 50, 100, 500, 1000, 5000} {
+			for _, p := range []int{1, 2, 4, 8, 16, 32, 64, 128} {
+				if !testParallelizeN(e, n, p) {
+					t.Fatalf("test [e=%v n=%d p=%d] failed", e, n, p)
+				}
+			}
+		}
+	}
+}
+
 func testParallelizeN(enabled bool, n, procs int) bool {
-	data := make([]bool, n)
-	runtime.GOMAXPROCS(procs)
-	parallelize(enabled, 0, n, func(start, end int) {
-		for i := start; i < end; i++ {
-			data[i] = true
+	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(procs))
+	data := make([]int, n)
+	parallelize(enabled, 0, n, func(start, stop int) {
+		for i := start; i < stop; i++ {
+			data[i]++
 		}
 	})
 	for i := 0; i < n; i++ {
-		if !data[i] {
+		if data[i] != 1 {
 			return false
 		}
 	}
 	return true
 }
 
-func TestParallelize(t *testing.T) {
-	for _, e := range []bool{true, false} {
-		for _, n := range []int{1, 10, 100, 1000} {
-			for _, p := range []int{1, 2, 4, 8, 16, 100} {
-				if !testParallelizeN(e, n, p) {
-					t.Errorf("failed testParallelizeN(%v, %d, %d)", e, n, p)
+func TestSplitRange(t *testing.T) {
+	for count := 0; count < 100; count++ {
+		for procs := 0; procs < 100; procs++ {
+			start := -55
+
+			var parts [][2]int
+			splitRange(start, start+count, procs, func(start, stop int) {
+				parts = append(parts, [2]int{start, stop})
+			})
+
+			wantLen := procs
+			if wantLen < 1 {
+				wantLen = 1
+			}
+			if wantLen > count {
+				wantLen = count
+			}
+			if len(parts) != wantLen {
+				t.Fatalf("test [count=%d procs=%d] got len(parts) %d want %d", count, procs, len(parts), wantLen)
+			}
+
+			data := make([]int, count)
+			for _, p := range parts {
+				for i := p[0]; i < p[1]; i++ {
+					data[i-start]++
+				}
+			}
+			for i := range data {
+				if data[i] != 1 {
+					t.Fatalf("test [count=%d procs=%d] got data[%d] == %d want 1", count, procs, i, data[i])
 				}
 			}
 		}

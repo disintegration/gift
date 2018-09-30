@@ -40,8 +40,8 @@ func (p *pixelateFilter) Draw(dst draw.Image, src image.Image, options *Options)
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, 0, numBlocksY, func(bmin, bmax int) {
-		for by := bmin; by < bmax; by++ {
+	parallelize(options.Parallelization, 0, numBlocksY, func(start, stop int) {
+		for by := start; by < stop; by++ {
 			for bx := 0; bx < numBlocksX; bx++ {
 				// calculate the block bounds
 				bb := image.Rect(bx*blockSize, by*blockSize, (bx+1)*blockSize, (by+1)*blockSize)

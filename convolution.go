@@ -105,9 +105,9 @@ func (p *convolutionFilter) Draw(dst draw.Image, src image.Image, options *Optio
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(start, stop int) {
 		// init temp rows
-		starty := pmin
+		starty := start
 		rows := make([][]pixel, ksize)
 		for i := 0; i < ksize; i++ {
 			rowy := starty + i - kcenter
@@ -121,7 +121,7 @@ func (p *convolutionFilter) Draw(dst draw.Image, src image.Image, options *Optio
 			rows[i] = row
 		}
 
-		for y := pmin; y < pmax; y++ {
+		for y := start; y < stop; y++ {
 			// calculate dst row
 			for x := srcb.Min.X; x < srcb.Max.X; x++ {
 				var r, g, b, a float32
@@ -166,7 +166,7 @@ func (p *convolutionFilter) Draw(dst draw.Image, src image.Image, options *Optio
 			}
 
 			// rotate temp rows
-			if y < pmax-1 {
+			if y < stop-1 {
 				tmprow := rows[0]
 				for i := 0; i < ksize-1; i++ {
 					rows[i] = rows[i+1]
@@ -284,10 +284,10 @@ func convolve1dv(dst draw.Image, src image.Image, kernel []float32, options *Opt
 	_, weights := prepareConvolutionWeights1d(kernel)
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
-	parallelize(options.Parallelization, srcb.Min.X, srcb.Max.X, func(pmin, pmax int) {
+	parallelize(options.Parallelization, srcb.Min.X, srcb.Max.X, func(start, stop int) {
 		srcBuf := make([]pixel, srcb.Dy())
 		dstBuf := make([]pixel, srcb.Dy())
-		for x := pmin; x < pmax; x++ {
+		for x := start; x < stop; x++ {
 			pixGetter.getPixelColumn(x, &srcBuf)
 			convolveLine(dstBuf, srcBuf, weights)
 			pixSetter.setPixelColumn(dstb.Min.X+x-srcb.Min.X, dstBuf)
@@ -309,10 +309,10 @@ func convolve1dh(dst draw.Image, src image.Image, kernel []float32, options *Opt
 	_, weights := prepareConvolutionWeights1d(kernel)
 	pixGetter := newPixelGetter(src)
 	pixSetter := newPixelSetter(dst)
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(start, stop int) {
 		srcBuf := make([]pixel, srcb.Dx())
 		dstBuf := make([]pixel, srcb.Dx())
-		for y := pmin; y < pmax; y++ {
+		for y := start; y < stop; y++ {
 			pixGetter.getPixelRow(y, &srcBuf)
 			convolveLine(dstBuf, srcBuf, weights)
 			pixSetter.setPixelRow(dstb.Min.Y+y-srcb.Min.Y, dstBuf)
@@ -429,8 +429,8 @@ func (p *unsharpMaskFilter) Draw(dst draw.Image, src image.Image, options *Optio
 	pixGetterBlur := newPixelGetter(blurred)
 	pixelSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
-		for y := pmin; y < pmax; y++ {
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(start, stop int) {
+		for y := start; y < stop; y++ {
 			for x := srcb.Min.X; x < srcb.Max.X; x++ {
 				pxOrig := pixGetterOrig.getPixel(x, y)
 				pxBlur := pixGetterBlur.getPixel(x, y)
@@ -554,8 +554,8 @@ func (p *hvConvolutionFilter) Draw(dst draw.Image, src image.Image, options *Opt
 
 	pixSetter := newPixelSetter(dst)
 
-	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(pmin, pmax int) {
-		for y := pmin; y < pmax; y++ {
+	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(start, stop int) {
+		for y := start; y < stop; y++ {
 			for x := srcb.Min.X; x < srcb.Max.X; x++ {
 				pxh := pixGetterH.getPixel(x, y)
 				pxv := pixGetterV.getPixel(x, y)
