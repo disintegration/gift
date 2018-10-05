@@ -1,6 +1,7 @@
 package gift
 
 import (
+	"bytes"
 	"image"
 	"testing"
 )
@@ -64,7 +65,7 @@ func TestResize(t *testing.T) {
 	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1Exp.Pix, img1.Pix) {
+	if !bytes.Equal(img1Exp.Pix, img1.Pix) {
 		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 
@@ -84,7 +85,7 @@ func TestResize(t *testing.T) {
 	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1Exp.Pix, img1.Pix) {
+	if !bytes.Equal(img1Exp.Pix, img1.Pix) {
 		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 

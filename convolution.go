@@ -106,7 +106,7 @@ func (p *convolutionFilter) Draw(dst draw.Image, src image.Image, options *Optio
 	pixSetter := newPixelSetter(dst)
 
 	parallelize(options.Parallelization, srcb.Min.Y, srcb.Max.Y, func(start, stop int) {
-		// init temp rows
+		// Init temporary rows.
 		starty := start
 		rows := make([][]pixel, ksize)
 		for i := 0; i < ksize; i++ {
@@ -122,7 +122,7 @@ func (p *convolutionFilter) Draw(dst draw.Image, src image.Image, options *Optio
 		}
 
 		for y := start; y < stop; y++ {
-			// calculate dst row
+			// Calculate dst row.
 			for x := srcb.Min.X; x < srcb.Max.X; x++ {
 				var r, g, b, a float32
 				for _, w := range weights {
@@ -165,7 +165,7 @@ func (p *convolutionFilter) Draw(dst draw.Image, src image.Image, options *Optio
 				pixSetter.setPixel(dstb.Min.X+x-srcb.Min.X, dstb.Min.Y+y-srcb.Min.Y, pixel{r, g, b, a})
 			}
 
-			// rotate temp rows
+			// Rotate temporary rows.
 			if y < stop-1 {
 				tmprow := rows[0]
 				for i := 0; i < ksize-1; i++ {
@@ -216,7 +216,8 @@ func Convolution(kernel []float32, normalize, alpha, abs bool, delta float32) Fi
 	}
 }
 
-// prepare pixel weights using convolution kernel. weights equal to 0 are excluded
+// prepareConvolutionWeights1d prepares pixel weights using a convolution kernel.
+// Weights equal to 0 are excluded.
 func prepareConvolutionWeights1d(kernel []float32) (int, []uweight) {
 	size := len(kernel)
 	if size%2 == 0 {
@@ -239,7 +240,7 @@ func prepareConvolutionWeights1d(kernel []float32) (int, []uweight) {
 	return size, weights
 }
 
-// calculate pixels for one line according to weights
+// convolveLine convolves a single line of pixels according to the given weights.
 func convolveLine(dstBuf []pixel, srcBuf []pixel, weights []uweight) {
 	max := len(srcBuf) - 1
 	if max < 0 {
@@ -270,7 +271,7 @@ func convolveLine(dstBuf []pixel, srcBuf []pixel, weights []uweight) {
 	}
 }
 
-// fast vertical 1d convolution
+// convolve1dv performs a fast vertical 1d convolution.
 func convolve1dv(dst draw.Image, src image.Image, kernel []float32, options *Options) {
 	srcb := src.Bounds()
 	dstb := dst.Bounds()
@@ -295,7 +296,7 @@ func convolve1dv(dst draw.Image, src image.Image, kernel []float32, options *Opt
 	})
 }
 
-// fast horizontal 1d convolution
+// convolve1dh performs afast horizontal 1d convolution.
 func convolve1dh(dst draw.Image, src image.Image, kernel []float32, options *Options) {
 	srcb := src.Bounds()
 	dstb := dst.Bounds()

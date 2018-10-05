@@ -1,22 +1,11 @@
 package gift
 
 import (
+	"bytes"
 	"image"
 	"image/color"
 	"testing"
 )
-
-func comparePix(p1, p2 []uint8) bool {
-	if len(p1) != len(p2) {
-		return false
-	}
-	for i := 0; i < len(p1); i++ {
-		if p1[i] != p2[i] {
-			return false
-		}
-	}
-	return true
-}
 
 func TestRotate90(t *testing.T) {
 	img0 := image.NewGray(image.Rect(-1, -1, 3, 1))
@@ -39,7 +28,7 @@ func TestRotate90(t *testing.T) {
 	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1Exp.Pix, img1.Pix) {
+	if !bytes.Equal(img1Exp.Pix, img1.Pix) {
 		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
@@ -63,7 +52,7 @@ func TestRotate180(t *testing.T) {
 	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1Exp.Pix, img1.Pix) {
+	if !bytes.Equal(img1Exp.Pix, img1.Pix) {
 		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
@@ -89,7 +78,7 @@ func TestRotate270(t *testing.T) {
 	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1Exp.Pix, img1.Pix) {
+	if !bytes.Equal(img1Exp.Pix, img1.Pix) {
 		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
@@ -113,7 +102,7 @@ func TestFlipHorizontal(t *testing.T) {
 	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1Exp.Pix, img1.Pix) {
+	if !bytes.Equal(img1Exp.Pix, img1.Pix) {
 		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
@@ -137,7 +126,7 @@ func TestFlipVertical(t *testing.T) {
 	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1Exp.Pix, img1.Pix) {
+	if !bytes.Equal(img1Exp.Pix, img1.Pix) {
 		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
@@ -163,7 +152,7 @@ func TestTranspose(t *testing.T) {
 	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1Exp.Pix, img1.Pix) {
+	if !bytes.Equal(img1Exp.Pix, img1.Pix) {
 		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }
@@ -189,7 +178,7 @@ func TestTransverse(t *testing.T) {
 	if img1.Bounds().Size() != img1Exp.Bounds().Size() {
 		t.Errorf("expected %v got %v", img1Exp.Bounds().Size(), img1.Bounds().Size())
 	}
-	if !comparePix(img1Exp.Pix, img1.Pix) {
+	if !bytes.Equal(img1Exp.Pix, img1.Pix) {
 		t.Errorf("expected %v got %v", img1Exp.Pix, img1.Pix)
 	}
 }

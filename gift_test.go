@@ -571,7 +571,7 @@ func TestGolden(t *testing.T) {
 				g = g0 + 0.1
 				b = 0
 				a = a0
-				return
+				return r, g, b, a
 			},
 		),
 		"convolution_emboss": Convolution(
@@ -644,7 +644,7 @@ func BenchmarkFilter(b *testing.B) {
 				g = g0 + 0.1
 				b = 0
 				a = a0
-				return
+				return r, g, b, a
 			},
 		)},
 		{"ColorspaceSRGBToLinear", ColorspaceSRGBToLinear()},

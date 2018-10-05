@@ -6,7 +6,6 @@ import (
 )
 
 func TestConvolution(t *testing.T) {
-
 	testData := []struct {
 		desc                  string
 		kernel                []float32
@@ -229,7 +228,6 @@ func TestConvolution(t *testing.T) {
 }
 
 func TestGaussianBlur(t *testing.T) {
-
 	testData := []struct {
 		desc           string
 		sigma          float32
@@ -320,7 +318,6 @@ func TestGaussianBlur(t *testing.T) {
 }
 
 func TestUnsharpMask(t *testing.T) {
-
 	testData := []struct {
 		desc                     string
 		sigma, amount, threshold float32
@@ -411,7 +408,6 @@ func TestUnsharpMask(t *testing.T) {
 }
 
 func TestMean(t *testing.T) {
-
 	testData := []struct {
 		desc           string
 		ksize          int

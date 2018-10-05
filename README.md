@@ -3,6 +3,8 @@
 [![GoDoc](https://godoc.org/github.com/disintegration/gift?status.svg)](https://godoc.org/github.com/disintegration/gift)
 [![Build Status](https://travis-ci.org/disintegration/gift.svg?branch=master)](https://travis-ci.org/disintegration/gift)
 [![Coverage Status](https://coveralls.io/repos/github/disintegration/gift/badge.svg?branch=master)](https://coveralls.io/github/disintegration/gift?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/disintegration/gift)](https://goreportcard.com/report/github.com/disintegration/gift)
+
 
 *Package gift provides a set of useful image processing filters.*
 
@@ -22,19 +24,19 @@ http://godoc.org/github.com/disintegration/gift
 ### QUICK START
 
 ```go
-// 1. Create a new GIFT filter list and add some filters:
+// 1. Create a new filter list and add some filters.
 g := gift.New(
 	gift.Resize(800, 0, gift.LanczosResampling),
 	gift.UnsharpMask(1, 1, 0),
 )
 
 // 2. Create a new image of the corresponding size.
-// dst is a new target image, src is the original image
+// dst is a new target image, src is the original image.
 dst := image.NewRGBA(g.Bounds(src.Bounds()))
 
-// 3. Use Draw func to apply the filters to src and store the result in dst:
+// 3. Use the Draw func to apply the filters to src and store the result in dst.
 g.Draw(dst, src)
-``` 
+```
 
 ### USAGE
 
@@ -47,10 +49,10 @@ g := gift.New(
 ```
 Filters also can be added using the `Add` method:
 ```go
-g.Add(GaussianBlur(2)) 
+g.Add(GaussianBlur(2))
 ```
 
-The `Bounds` method takes the bounds of the source image and returns appropriate bounds for the destination image to fit the result (for example, after using `Resize` or `Rotate` filters). 
+The `Bounds` method takes the bounds of the source image and returns appropriate bounds for the destination image to fit the result (for example, after using `Resize` or `Rotate` filters).
 
 ```go
 dst := image.NewRGBA(g.Bounds(src.Bounds()))
@@ -100,7 +102,7 @@ gift.New().DrawAt(dstImage, fgImage, image.Pt(100, 100), gift.OverOperator)
     - Rotate90()
     - Transpose()
     - Transverse()
-    
+
 + Adjustments & effects
 
     - Brightness(percentage float32)
@@ -133,7 +135,7 @@ gift.New().DrawAt(dstImage, fgImage, image.Pt(100, 100), gift.OverOperator)
 
 The original image:
 
-![](testdata/src.png) 
+![](testdata/src.png)
 
 Resulting images after applying some of the filters:
 
@@ -205,7 +207,7 @@ func main() {
 				g = g0 + 0.1 // shift the green channel by 0.1
 				b = 0        // set the blue channel to 0
 				a = a0       // preserve the alpha channel
-				return
+				return r, g, b, a
 			},
 		),
 		"convolution_emboss": gift.Convolution(

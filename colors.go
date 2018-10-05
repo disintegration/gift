@@ -292,7 +292,7 @@ func convertHSLToRGB(h, s, l float32) (float32, float32, float32) {
 		return l, l, l
 	}
 
-	_v := func(p, q, t float32) float32 {
+	hueToRGB := func(p, q, t float32) float32 {
 		if t < 0 {
 			t++
 		}
@@ -319,9 +319,9 @@ func convertHSLToRGB(h, s, l float32) (float32, float32, float32) {
 	}
 	p = 2*l - q
 
-	r := _v(p, q, h+1/3.0)
-	g := _v(p, q, h)
-	b := _v(p, q, h-1/3.0)
+	r := hueToRGB(p, q, h+1/3.0)
+	g := hueToRGB(p, q, h)
+	b := hueToRGB(p, q, h-1/3.0)
 
 	return r, g, b
 }
@@ -494,7 +494,7 @@ func Threshold(percentage float32) Filter {
 //				g = g0 + 0.1 // shift the green channel by 0.1
 //				b = 0        // set the blue channel to 0
 //				a = a0       // preserve the alpha channel
-//				return
+//				return r, g, b, a
 //			},
 //		),
 //	)

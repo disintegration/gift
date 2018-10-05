@@ -71,7 +71,7 @@ func (p *rankFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 		}
 
 		for y := start; y < stop; y++ {
-			// init buffer
+			// Init buffer.
 			pxbuf = pxbuf[:0]
 			for i := srcb.Min.X - kradius; i <= srcb.Min.X+kradius; i++ {
 				for j := y - kradius; j <= y+kradius; j++ {
@@ -163,7 +163,7 @@ func (p *rankFilter) Draw(dst draw.Image, src image.Image, options *Options) {
 
 				pixSetter.setPixel(dstb.Min.X+x-srcb.Min.X, dstb.Min.Y+y-srcb.Min.Y, pixel{r, g, b, a})
 
-				// rotate buffer columns
+				// Rotate buffer columns.
 				if x < srcb.Max.X-1 {
 					copy(pxbuf[0:], pxbuf[ksize:])
 					pxbuf = pxbuf[0 : ksize*(ksize-1)]

@@ -1,23 +1,19 @@
 /*
-
 Package gift provides a set of useful image processing filters.
 
 Basic usage:
 
-	// 1. Create a new GIFT and add some filters:
-
+	// 1. Create a new filter list and add some filters.
 	g := gift.New(
 	    gift.Resize(800, 0, gift.LanczosResampling),
 	    gift.UnsharpMask(1, 1, 0),
 	)
 
 	// 2. Create a new image of the corresponding size.
-	// dst is a new target image, src is the original image
-
+	// dst is a new target image, src is the original image.
 	dst := image.NewRGBA(g.Bounds(src.Bounds()))
 
-	// 3. Use Draw func to apply the filters to src and store the result in dst:
-
+	// 3. Use the Draw func to apply the filters to src and store the result in dst.
 	g.Draw(dst, src)
 
 */
@@ -45,13 +41,13 @@ var defaultOptions = Options{
 	Parallelization: true,
 }
 
-// GIFT implements a list of filters that can be applied to an image at once.
+// GIFT is a list of image processing filters.
 type GIFT struct {
 	Filters []Filter
 	Options Options
 }
 
-// New creates a new instance of the filter toolkit and initializes it with the given list of filters.
+// New creates a new filter list and initializes it with the given slice of filters.
 func New(filters ...Filter) *GIFT {
 	return &GIFT{
 		Filters: filters,
@@ -59,7 +55,7 @@ func New(filters ...Filter) *GIFT {
 	}
 }
 
-// SetParallelization enables or disables faster image processing using parallel goroutines.
+// SetParallelization enables or disables the image processing parallelization.
 // Parallelization is enabled by default.
 func (g *GIFT) SetParallelization(isEnabled bool) {
 	g.Options.Parallelization = isEnabled
