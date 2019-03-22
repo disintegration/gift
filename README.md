@@ -233,6 +233,7 @@ func loadImage(filename string) image.Image {
 	if err != nil {
 		log.Fatalf("os.Open failed: %v", err)
 	}
+	defer f.Close()
 	img, _, err := image.Decode(f)
 	if err != nil {
 		log.Fatalf("image.Decode failed: %v", err)
@@ -245,6 +246,7 @@ func saveImage(filename string, img image.Image) {
 	if err != nil {
 		log.Fatalf("os.Create failed: %v", err)
 	}
+	defer f.Close()
 	err = png.Encode(f, img)
 	if err != nil {
 		log.Fatalf("png.Encode failed: %v", err)
