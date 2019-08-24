@@ -7,7 +7,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
-	"reflect"
+	"runtime"
 	"testing"
 )
 
@@ -589,10 +589,39 @@ func TestGolden(t *testing.T) {
 		dst := image.NewNRGBA(g.Bounds(src.Bounds()))
 		g.Draw(dst, src)
 		want := loadImageNRGBA(t, "testdata/dst_"+name+".png")
-		if !reflect.DeepEqual(dst, want) {
+		if !goldenEqual(dst, want) {
 			t.Errorf("resulting image differs from golden: %s", name)
 		}
 	}
+}
+
+// goldenEqual compares two NRGBA images. It is used in golden tests only.
+// All the golden images are generated on amd64 architecture. Due to differences
+// in floating-point rounding on different architectures, we need to add some
+// level of tolerance when comparing images on architectures other than amd64.
+// See https://golang.org/ref/spec#Floating_point_operators for information on
+// fused multiply and add (FMA) instruction.
+func goldenEqual(img1, img2 *image.NRGBA) bool {
+	maxDiff := 0
+	if runtime.GOARCH != "amd64" {
+		maxDiff = 1
+	}
+	if !img1.Rect.Eq(img2.Rect) {
+		return false
+	}
+	if len(img1.Pix) != len(img2.Pix) {
+		return false
+	}
+	for i := 0; i < len(img1.Pix); i++ {
+		diff := int(img1.Pix[i]) - int(img2.Pix[i])
+		if diff < 0 {
+			diff = -diff
+		}
+		if diff > maxDiff {
+			return false
+		}
+	}
+	return true
 }
 
 func BenchmarkFilter(b *testing.B) {
