@@ -72,7 +72,7 @@ g.DrawAt(dst, src, dst.Bounds().Min, gift.CopyOperator)
 
 Two image composition operators are supported by now:
 - `CopyOperator` - Replaces pixels of the dst image with pixels of the filtered src image. This mode is used by the Draw method.
-- `OverOperator` - Places the filtered src image on top of the dst image. This mode makes sence if the filtered src image has transparent areas.
+- `OverOperator` - Places the filtered src image on top of the dst image. This mode makes sense if the filtered src image has transparent areas.
 
 Empty filter list can be used to create a copy of an image or to paste one image to another. For example:
 ```go
